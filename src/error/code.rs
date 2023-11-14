@@ -1,0 +1,80 @@
+use std::fmt::Display;
+
+use serde_repr::Deserialize_repr;
+
+
+#[derive(Deserialize_repr, Debug, Clone, Copy)]
+#[repr(u16)]
+pub enum StErrorCode {
+    CooldownConflictError = 4000,
+    TokenEmptyError = 4100,
+    TokenMissingSubjectError = 4101,
+    TokenInvalidSubjectError = 4102,
+    MissingTokenRequestError = 4103,
+    InvalidTokenRequestError = 4104,
+    InvalidTokenSubjectError = 4105,
+    AccountNotExistsError = 4106,
+    AgentNotExistsError = 4107,
+    AccountHasNoAgentError = 4108,
+    RegisterAgentExistsError = 4109,
+    NavigateInTransitError = 4200,
+    NavigateInvalidDestinationError = 4201,
+    NavigateOutsideSystemError = 4202,
+    NavigateInsufficientFuelError = 4203,
+    NavigateSameDestinationError = 4204,
+    ShipExtractInvalidWaypointError = 4205,
+    ShipExtractPermissionError = 4206,
+    ShipJumpNoSystemError = 4207,
+    ShipJumpSameSystemError = 4208,
+    ShipJumpMissingModuleError = 4210,
+    ShipJumpNoValidWaypointError = 4211,
+    ShipJumpMissingAntimatterError = 4212,
+    ShipInTransitError = 4214,
+    ShipMissingSensorArraysError = 4215,
+    PurchaseShipCreditsError = 4216,
+    ShipCargoExceedsLimitError = 4217,
+    ShipCargoMissingError = 4218,
+    ShipCargoUnitCountError = 4219,
+    ShipSurveyVerificationError = 4220,
+    ShipSurveyExpirationError = 4221,
+    ShipSurveyWaypointTypeError = 4222,
+    ShipSurveyOrbitError = 4223,
+    ShipSurveyExhaustedError = 4224,
+    ShipRefuelDockedError = 4225,
+    ShipRefuelInvalidWaypointError = 4226,
+    ShipMissingMountsError = 4227,
+    ShipCargoFullError = 4228,
+    ShipJumpFromGateToGateError = 4229,
+    WaypointChartedError = 4230,
+    ShipTransferShipNotFound = 4231,
+    ShipTransferAgentConflict = 4232,
+    ShipTransferSameShipConflict = 4233,
+    ShipTransferLocationConflict = 4234,
+    WarpInsideSystemError = 4235,
+    ShipNotInOrbitError = 4236,
+    ShipInvalidRefineryGoodError = 4237,
+    ShipInvalidRefineryTypeError = 4238,
+    ShipMissingRefineryError = 4239,
+    ShipMissingSurveyorError = 4240,
+    AcceptContractNotAuthorizedError = 4500,
+    AcceptContractConflictError = 4501,
+    FulfillContractDeliveryError = 4502,
+    ContractDeadlineError = 4503,
+    ContractFulfilledError = 4504,
+    ContractNotAcceptedError = 4505,
+    ContractNotAuthorizedError = 4506,
+    ShipDeliverTermsError = 4508,
+    ShipDeliverFulfilledError = 4509,
+    ShipDeliverInvalidLocationError = 4510,
+    MarketTradeInsufficientCreditsError = 4600,
+    MarketTradeNoPurchaseError = 4601,
+    MarketTradeNotSoldError = 4602,
+    MarketNotFoundError = 4603,
+    MarketTradeUnitLimitError = 4604,
+}
+
+impl Display for StErrorCode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}

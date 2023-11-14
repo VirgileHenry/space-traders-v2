@@ -69,13 +69,13 @@ impl SpaceTradersClient<Authenticated> {
         self.http_client.get(format!("{}/{}", SPACE_TRADERS_API, path))
             .header("Accept", "application/json")
             .header("Content-Type", "application/json")
-            .header("Authentication", &self.auth_token.0)
+            .header("Authorization", format!("Bearer {}", &self.auth_token.0))
     }
 
     pub(crate) fn post(&self, path: &str) -> reqwest::RequestBuilder {
         self.http_client.post(format!("{}/{}", SPACE_TRADERS_API, path))
             .header("Accept", "application/json")
             .header("Content-Type", "application/json")
-            .header("Authentication", &self.auth_token.0)
+            .header("Authorization", format!("Bearer {}", &self.auth_token.0))
     }
 }

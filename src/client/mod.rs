@@ -8,7 +8,7 @@ const SPACE_TRADERS_API: &'static str  = "https://api.spacetraders.io/v2";
 /// If you are using this API, this read a agent token from a file that is ignored by git.
 /// You can change the file with a valid token so you can test the api. 
 #[cfg(test)]
-pub(crate) const TEST_AGENT_TOKEN: &'static str = include_str!("../agent_secret");
+pub(crate) const TEST_AGENT_TOKEN: &'static str = include_str!("../agent_secret/secret.txt");
 
 pub trait AuthState {}
 

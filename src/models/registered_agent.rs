@@ -1,7 +1,7 @@
 use serde::Deserialize;
-use crate::{utils::deserialize::deserialize, client::{AuthState, SpaceTradersClient, Anonymous, Authenticated}};
+use crate::{utils::{deserialize::deserialize, wrapper::DataWrapper}, client::{AuthState, SpaceTradersClient, Anonymous, Authenticated}};
 
-use super::{agent::Agent, wrapper::DataWrapper};
+use super::agent::Agent;
 
 /// A registered agent is an agent that have juste been registered.
 /// It is a wrapper around an agent and additionnal info regarding creation, like auth token.

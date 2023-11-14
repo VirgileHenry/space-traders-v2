@@ -1,7 +1,10 @@
 use serde::Deserialize;
 use serde_json::Value;
 
-use crate::{error::server_error::ServerError, models::wrapper::ErrorWrapper};
+use crate::{
+    error::server_error::ServerError,
+    utils::wrapper::ErrorWrapper
+};
 
 /// Will attempt to deserialize to T value,
 /// then if it fails will attempt to deserialize to server value,

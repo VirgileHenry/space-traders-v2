@@ -36,7 +36,7 @@ mod test {
     #[tokio::test]
     async fn test_agent() {
         let client = crate::client::SpaceTradersClient::new_anonymous();
-        let agent = client.create_agent("virgile.henry0211@gmail.com", "COSMIC", "ROSSIGNOL").await;
+        let agent = client.create_agent("your.email@here.com", "COSMIC", "YOUR_AGENT_NAME").await;
         println!("{:?}", agent);
     }
 }

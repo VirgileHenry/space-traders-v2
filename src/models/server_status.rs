@@ -74,6 +74,9 @@ pub struct ServerLinks {
 }
 
 impl crate::client::SpaceTradersClient<Authenticated> {
+    /// Return the status of the game server.
+    /// This also includes a few global elements, such as announcements,
+    /// server reset dates and leaderboards.
     pub async fn get_server_status(&self) -> Result<ServerStatus, crate::Error> {
         let request = self.get("")
             .send()
@@ -86,6 +89,9 @@ impl crate::client::SpaceTradersClient<Authenticated> {
 }
 
 impl crate::client::SpaceTradersClient<Anonymous> {
+    /// Return the status of the game server.
+    /// This also includes a few global elements, such as announcements,
+    /// server reset dates and leaderboards.
     pub async fn get_server_status(&self) -> Result<ServerStatus, crate::Error> {
         let request = self.get("")
             .send()

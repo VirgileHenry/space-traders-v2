@@ -27,6 +27,7 @@ pub struct Agent {
 }
 
 impl crate::client::SpaceTradersClient<Authenticated> {
+    /// Fetch your agent's details.
     pub async fn get_agent(&self) -> Result<Agent, crate::Error> {
         let request = self.get("my/agent")
             .send()
@@ -39,6 +40,7 @@ impl crate::client::SpaceTradersClient<Authenticated> {
 }
 
 impl crate::client::SpaceTradersClient<Authenticated> {
+    /// Fetch agents details.
     pub async fn list_agents(&self) -> Result<(Vec<Agent>, Meta), crate::Error> {
         let request = self.get("agents")
             .send()
@@ -51,6 +53,7 @@ impl crate::client::SpaceTradersClient<Authenticated> {
 }
 
 impl crate::client::SpaceTradersClient<Anonymous> {
+    /// Fetch agents details.
     pub async fn list_agents(&self) -> Result<(Vec<Agent>, Meta), crate::Error> {
         let request = self.get("agents")
             .send()
@@ -63,6 +66,7 @@ impl crate::client::SpaceTradersClient<Anonymous> {
 }
 
 impl crate::client::SpaceTradersClient<Authenticated> {
+    /// Fetch agent details.
     pub async fn get_public_agent(&self, agent_symbol: &str) -> Result<Agent, crate::Error> {
         let request = self.get(&format!("agents/{agent_symbol}"))
             .send()
@@ -75,6 +79,7 @@ impl crate::client::SpaceTradersClient<Authenticated> {
 }
 
 impl crate::client::SpaceTradersClient<Anonymous> {
+    /// Fetch agent details.
     pub async fn get_public_agent(&self, agent_symbol: &str) -> Result<Agent, crate::Error> {
         let request = self.get(&format!("agents/{agent_symbol}"))
             .send()

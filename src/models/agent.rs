@@ -3,7 +3,7 @@ use serde::Deserialize;
 use crate::{
     utils::{
         deserialize::deserialize,
-        wrapper::{DataWrapper, DataAndMetaWrapper}
+        wrapper::{DataWrapper, DataAndMetaWrapper}, pagination::page_limit_and_index
     },
     client::{
         AuthState,
@@ -39,8 +39,10 @@ impl crate::client::SpaceTradersClient<Authenticated> {
     }
 
     /// Fetch agents details.
-    pub async fn list_agents(&self) -> Result<(Vec<Agent>, Meta), crate::Error> {
+    pub async fn list_agents(&self, page_limit: Option<usize>, page_index: Option<usize>) -> Result<(Vec<Agent>, Meta), crate::Error> {
+        let (limit, page) = page_limit_and_index(page_limit, page_index);
         let request = self.get("agents")
+        .query(&[("limit", limit), ("page", page)])
             .send()
             .await?;
         let json = request
@@ -63,8 +65,10 @@ impl crate::client::SpaceTradersClient<Authenticated> {
 
 impl crate::client::SpaceTradersClient<Anonymous> {
     /// Fetch agents details.
-    pub async fn list_agents(&self) -> Result<(Vec<Agent>, Meta), crate::Error> {
+    pub async fn list_agents(&self, page_limit: Option<usize>, page_index: Option<usize>) -> Result<(Vec<Agent>, Meta), crate::Error> {
+        let (limit, page) = page_limit_and_index(page_limit, page_index);
         let request = self.get("agents")
+        .query(&[("limit", limit), ("page", page)])
             .send()
             .await?;
         let json = request
@@ -94,7 +98,7 @@ mod test {
         let client = crate::client::SpaceTradersClient::new_with_auth(TEST_AGENT_TOKEN);
         let agent = client.get_agent().await;
         println!("{agent:?}");
-        let agents = client.list_agents().await;
+        let agents = client.list_agents(None, None).await;
         println!("{agents:?}");
         let luciole = client.get_public_agent("LUCIOLE").await;
         println!("{luciole:?}");

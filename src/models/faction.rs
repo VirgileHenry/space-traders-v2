@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-use crate::{client::{Authenticated, Anonymous}, utils::{deserialize::deserialize, wrapper::{DataAndMetaWrapper, DataWrapper}}};
+use crate::{client::{Authenticated, Anonymous}, utils::{deserialize::deserialize, wrapper::{DataAndMetaWrapper, DataWrapper}, pagination::page_limit_and_index}};
 
 use super::meta::Meta;
 
@@ -116,8 +116,10 @@ pub struct Faction {
 
 impl crate::SpaceTradersClient<Authenticated> {
     /// Return a paginated list of all the factions in the game.
-    pub async fn list_factions(&self) -> Result<(Vec<Faction>, Meta), crate::Error> {
+    pub async fn list_factions(&self, page_limit: Option<usize>, page_index: Option<usize>) -> Result<(Vec<Faction>, Meta), crate::Error> {
+        let (limit, page) = page_limit_and_index(page_limit, page_index);
         let request = self.get("factions")
+            .query(&[("limit", limit), ("page", page)])
             .send()
             .await?;
         let json = request
@@ -139,9 +141,11 @@ impl crate::SpaceTradersClient<Authenticated> {
 }
 
 impl crate::SpaceTradersClient<Anonymous> {
-    /// Return a paginated list of all your contracts.Return a paginated list of all the factions in the game.
-    pub async fn list_factions(&self) -> Result<(Vec<Faction>, Meta), crate::Error> {
+    /// Return a paginated list of all the factions in the game.
+    pub async fn list_factions(&self, page_limit: Option<usize>, page_index: Option<usize>) -> Result<(Vec<Faction>, Meta), crate::Error> {
+        let (limit, page) = page_limit_and_index(page_limit, page_index);
         let request = self.get("factions")
+            .query(&[("limit", limit), ("page", page)])
             .send()
             .await?;
         let json = request

@@ -7,7 +7,7 @@ use crate::{
         wrapper::{
             DataAndMetaWrapper,
             DataWrapper
-        }
+        }, pagination::page_limit_and_index
     }
 };
 
@@ -15,7 +15,7 @@ use super::meta::Meta;
 
 /// Type of contract.
 #[derive(Deserialize, Debug, Clone)]
-#[serde(rename_all = "UPPERCASE")]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum ContractType {
     Procurement,
     Transport,
@@ -82,8 +82,10 @@ pub struct AgentAndContract {
 
 impl crate::SpaceTradersClient<Authenticated> {
     /// Return a paginated list of all your contracts.
-    pub async fn list_contracts(&self) -> Result<(Vec<Contract>, Meta), crate::Error> {
+    pub async fn list_contracts(&self, page_limit: Option<usize>, page_index: Option<usize>) -> Result<(Vec<Contract>, Meta), crate::Error> {
+        let (limit, page) = page_limit_and_index(page_limit, page_index);
         let request = self.get("my/contracts")
+            .query(&[("limit", limit), ("page", page)])
             .send()
             .await?;
         let json = request
@@ -158,7 +160,7 @@ mod test {
     #[tokio::test]
     async fn test_agent() {
         let client = crate::client::SpaceTradersClient::new_with_auth(TEST_AGENT_TOKEN);
-        let contracts = client.list_contracts().await;
+        let contracts = client.list_contracts(None, None).await;
         println!("{contracts:?}");
         let contract = client.get_contract("cloyrd0gs1edps60cl4z96536").await;
         println!("{contract:?}")

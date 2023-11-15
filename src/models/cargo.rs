@@ -1,3 +1,5 @@
+use std::num::NonZeroU64;
+
 use serde::Deserialize;
 
 #[derive(Deserialize, Debug, Clone)]
@@ -14,5 +16,5 @@ pub struct CargoItem {
     symbol: String,
     name: String,
     description: String,
-    units: u64,
+    units: NonZeroU64,
 }

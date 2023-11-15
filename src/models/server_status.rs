@@ -1,6 +1,9 @@
 use serde::Deserialize;
 
-use crate::{client::{Authenticated, Anonymous}, utils::deserialize::deserialize};
+use crate::{client::{
+    Authenticated,
+    Anonymous
+}, utils::wrapper::DataWrapper, error::server_error::ServerError};
 
 /// Info about the current server.
 #[derive(Deserialize, Debug, Clone)]
@@ -78,13 +81,23 @@ impl crate::client::SpaceTradersClient<Authenticated> {
     /// This also includes a few global elements, such as announcements,
     /// server reset dates and leaderboards.
     pub async fn get_server_status(&self) -> Result<ServerStatus, crate::Error> {
-        let request = self.get("")
+        let response = self.get("")
             .send()
             .await?;
-        let json = request
-            .json::<serde_json::Value>()
-            .await?;
-        Ok(deserialize::<ServerStatus>(json)?)
+        match response.status().as_u16() {
+            200 => {
+                let json = response
+                    .json::<serde_json::Value>()
+                    .await?;
+                Ok(<DataWrapper::<ServerStatus>>::deserialize(json)?.inner())
+            }
+            other => {
+                let json = response
+                    .json::<serde_json::Value>()
+                    .await?;
+                Err(crate::Error::FromServerError(<ServerError>::deserialize(json)?))
+            }
+        }
     }
 }
 
@@ -93,13 +106,23 @@ impl crate::client::SpaceTradersClient<Anonymous> {
     /// This also includes a few global elements, such as announcements,
     /// server reset dates and leaderboards.
     pub async fn get_server_status(&self) -> Result<ServerStatus, crate::Error> {
-        let request = self.get("")
+        let response = self.get("")
             .send()
             .await?;
-        let json = request
-            .json::<serde_json::Value>()
-            .await?;
-        Ok(deserialize::<ServerStatus>(json)?)
+        match response.status().as_u16() {
+            200 => {
+                let json = response
+                    .json::<serde_json::Value>()
+                    .await?;
+                Ok(ServerStatus::deserialize(json)?)
+            }
+            other => {
+                let json = response
+                    .json::<serde_json::Value>()
+                    .await?;
+                Err(crate::Error::FromServerError(<ServerError>::deserialize(json)?))
+            }
+        }
     }
 }
 

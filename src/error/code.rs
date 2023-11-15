@@ -5,7 +5,7 @@ use serde_repr::Deserialize_repr;
 
 #[derive(Deserialize_repr, Debug, Clone, Copy)]
 #[repr(u16)]
-pub enum StErrorCode {
+pub enum ErrorCode {
     CooldownConflictError = 4000,
     TokenEmptyError = 4100,
     TokenMissingSubjectError = 4101,
@@ -73,7 +73,7 @@ pub enum StErrorCode {
     MarketTradeUnitLimitError = 4604,
 }
 
-impl Display for StErrorCode {
+impl Display for ErrorCode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{:?}", self)
     }

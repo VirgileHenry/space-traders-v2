@@ -1,5 +1,13 @@
 use serde::Deserialize;
-use crate::{utils::{deserialize::deserialize, wrapper::DataWrapper}, client::{AuthState, SpaceTradersClient, Anonymous, Authenticated}};
+use crate::{
+    utils::wrapper::DataWrapper,
+    client::{
+        AuthState,
+        SpaceTradersClient,
+        Anonymous,
+        Authenticated
+    }, error::server_error::ServerError
+};
 
 use super::agent::Agent;
 
@@ -30,14 +38,24 @@ impl crate::client::SpaceTradersClient<Anonymous> {
             "symbol": symbol,
             "email": email
         });
-        let request = self.post("register")
+        let response = self.post("register")
             .json(&body)
             .send()
             .await?;
-        let json = request
-            .json::<serde_json::Value>()
-            .await?;
-        Ok(deserialize::<DataWrapper::<RegisteredAgent>>(json)?.inner())
+        match response.status().as_u16() {
+            201 => {
+                let json = response
+                    .json::<serde_json::Value>()
+                    .await?;
+                Ok(<DataWrapper::<RegisteredAgent>>::deserialize(json)?.inner())
+            }
+            other => {
+                let json = response
+                    .json::<serde_json::Value>()
+                    .await?;
+                Err(crate::Error::FromServerError(<ServerError>::deserialize(json)?))
+            }
+        }
     }
 }
 
@@ -46,7 +64,7 @@ mod test {
     #[tokio::test]
     async fn test_agent() {
         let client = crate::client::SpaceTradersClient::new_anonymous();
-        let agent = client.create_agent("your.email@here.com", "COSMIC", "YOUR_AGENT_NAME").await;
+        let agent = client.create_agent("virgile.henry@aalti.fi", "COSMIC", "BLUE").await;
         println!("{:?}", agent);
     }
 }

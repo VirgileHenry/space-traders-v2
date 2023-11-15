@@ -3,12 +3,11 @@ use serde::Deserialize;
 use crate::{
     client::Authenticated,
     utils::{
-        deserialize::deserialize,
         wrapper::{
             DataAndMetaWrapper,
             DataWrapper
         }, pagination::page_limit_and_index
-    }
+    }, error::server_error::ServerError
 };
 
 use super::meta::Meta;
@@ -84,38 +83,69 @@ impl crate::SpaceTradersClient<Authenticated> {
     /// Return a paginated list of all your contracts.
     pub async fn list_contracts(&self, page_limit: Option<usize>, page_index: Option<usize>) -> Result<(Vec<Contract>, Meta), crate::Error> {
         let (limit, page) = page_limit_and_index(page_limit, page_index);
-        let request = self.get("my/contracts")
+        let response = self.get("my/contracts")
             .query(&[("limit", limit), ("page", page)])
             .send()
             .await?;
-        let json = request
-            .json::<serde_json::Value>()
-            .await?;
-        Ok(deserialize::<DataAndMetaWrapper::<Contract>>(json)?.inner())
+        match response.status().as_u16() {
+            200 => {
+                let json = response
+                    .json::<serde_json::Value>()
+                    .await?;
+                Ok(<DataAndMetaWrapper::<Contract>>::deserialize(json)?.inner())
+            }
+            other => {
+                let json = response
+                    .json::<serde_json::Value>()
+                    .await?;
+                Err(crate::Error::FromServerError(<ServerError>::deserialize(json)?))
+            }
+        }
     }
 
     /// Get the details of a contract by ID.
     pub async fn get_contract(&self, contract_id: &str) -> Result<Contract, crate::Error> {
-        let request = self.get(&format!("my/contracts/{contract_id}"))
+        let response = self.get(&format!("my/contracts/{contract_id}"))
             .send()
             .await?;
-        let json = request
-            .json::<serde_json::Value>()
-            .await?;
-        Ok(deserialize::<DataWrapper::<Contract>>(json)?.inner())
+        match response.status().as_u16() {
+            200 => {
+                let json = response
+                    .json::<serde_json::Value>()
+                    .await?;
+                Ok(<DataWrapper::<Contract>>::deserialize(json)?.inner())
+            }
+            other => {
+                let json = response
+                    .json::<serde_json::Value>()
+                    .await?;
+                Err(crate::Error::FromServerError(<ServerError>::deserialize(json)?))
+            }
+        }
     }
 
     /// Accept a contract by ID.
+    /// 
     /// You can only accept contracts that were offered to you,
     /// were not accepted yet, and whose deadlines has not passed yet.
-    pub async fn accept_contract(&self, contract_id: &str) -> Result<Contract, crate::Error> {
-        let request = self.post(&format!("my/contracts/{contract_id}/accept"))
+    pub async fn accept_contract(&self, contract_id: &str) -> Result<AgentAndContract, crate::Error> {
+        let response = self.post(&format!("my/contracts/{contract_id}/accept"))
             .send()
             .await?;
-        let json = request
-            .json::<serde_json::Value>()
-            .await?;
-        Ok(deserialize::<DataWrapper::<Contract>>(json)?.inner())
+        match response.status().as_u16() {
+            200 => {
+                let json = response
+                    .json::<serde_json::Value>()
+                    .await?;
+                Ok(<DataWrapper::<AgentAndContract>>::deserialize(json)?.inner())
+            }
+            other => {
+                let json = response
+                    .json::<serde_json::Value>()
+                    .await?;
+                Err(crate::Error::FromServerError(<ServerError>::deserialize(json)?))
+            }
+        }
     }
 
     /// Deliver cargo to a contract.
@@ -129,26 +159,46 @@ impl crate::SpaceTradersClient<Authenticated> {
             "tradeSymbol": trade_symbol,
             "units": units
         });
-        let request = self.post(&format!("my/contracts/{contract_id}/deliver"))
+        let response = self.post(&format!("my/contracts/{contract_id}/deliver"))
             .json(&body)
             .send()
             .await?;
-        let json = request
-            .json::<serde_json::Value>()
-            .await?;
-        Ok(deserialize::<DataWrapper::<ContractAndCargo>>(json)?.inner())
+        match response.status().as_u16() {
+            200 => {
+                let json = response
+                    .json::<serde_json::Value>()
+                    .await?;
+                Ok(<DataWrapper::<ContractAndCargo>>::deserialize(json)?.inner())
+            }
+            other => {
+                let json = response
+                    .json::<serde_json::Value>()
+                    .await?;
+                Err(crate::Error::FromServerError(<ServerError>::deserialize(json)?))
+            }
+        }
     }
 
     /// Fulfill a contract.
     /// Can only be used on contracts that have all of their delivery terms fulfilled.
     pub async fn fulfill_contract(&self, contract_id: &str) -> Result<AgentAndContract, crate::Error> {
-        let request = self.post(&format!("my/contracts/{contract_id}/fulfill"))
+        let response = self.post(&format!("my/contracts/{contract_id}/fulfill"))
             .send()
             .await?;
-        let json = request
-            .json::<serde_json::Value>()
-            .await?;
-        Ok(deserialize::<DataWrapper::<AgentAndContract>>(json)?.inner())
+        match response.status().as_u16() {
+            200 => {
+                let json = response
+                    .json::<serde_json::Value>()
+                    .await?;
+                Ok(<DataWrapper::<AgentAndContract>>::deserialize(json)?.inner())
+            }
+            other => {
+                let json = response
+                    .json::<serde_json::Value>()
+                    .await?;
+                Err(crate::Error::FromServerError(<ServerError>::deserialize(json)?))
+            }
+        }
     }
 }
 

@@ -1,13 +1,13 @@
 use std::fmt::Display;
 
 use serde::Deserialize;
-use super::code::StErrorCode;
+use super::code::ErrorCode;
 
 
 #[derive(Deserialize, Debug, Clone)]
 pub struct ServerError {
     message: String,
-    code: StErrorCode,
+    code: ErrorCode,
 }
 
 impl Display for ServerError {

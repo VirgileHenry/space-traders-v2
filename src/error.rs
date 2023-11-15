@@ -5,7 +5,7 @@ pub mod code;
 
 #[derive(Debug)]
 pub enum Error {
-    ServerError(ServerError),
+    FromServerError(ServerError),
     RequestError(reqwest::Error),
     JsonParsingError(serde_json::Error),
 }
@@ -18,7 +18,7 @@ impl From<reqwest::Error> for Error {
 
 impl From<ServerError> for Error {
     fn from(value: ServerError) -> Self {
-        Error::ServerError(value)
+        Error::FromServerError(value)
     }
 }
 

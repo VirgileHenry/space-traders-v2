@@ -1,6 +1,18 @@
 use serde::Deserialize;
 
-use crate::{client::{Authenticated, Anonymous}, utils::{deserialize::deserialize, wrapper::{DataAndMetaWrapper, DataWrapper}, pagination::page_limit_and_index}};
+use crate::{
+    client::{
+        Authenticated,
+        Anonymous
+    },
+    utils::{
+        wrapper::{
+            DataAndMetaWrapper,
+            DataWrapper
+        },
+        pagination::page_limit_and_index
+    }, error::server_error::ServerError
+};
 
 use super::meta::Meta;
 
@@ -8,7 +20,7 @@ use super::meta::Meta;
 /// All existing factions.
 #[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-pub enum FactionSymbol {
+pub enum FactionType {
     Cosmic,
     Void,
     Galactic,
@@ -106,7 +118,7 @@ pub struct FactionTrait {
 #[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Faction {
-    symbol: FactionSymbol,
+    symbol: FactionType,
     name: String,
     description: String,
     headquarters: String,
@@ -114,29 +126,55 @@ pub struct Faction {
     is_recruiting: bool,
 }
 
+#[derive(Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct FactionSymbol {
+    symbol: FactionType,
+}
+
 impl crate::SpaceTradersClient<Authenticated> {
     /// Return a paginated list of all the factions in the game.
     pub async fn list_factions(&self, page_limit: Option<usize>, page_index: Option<usize>) -> Result<(Vec<Faction>, Meta), crate::Error> {
         let (limit, page) = page_limit_and_index(page_limit, page_index);
-        let request = self.get("factions")
+        let response = self.get("factions")
             .query(&[("limit", limit), ("page", page)])
             .send()
             .await?;
-        let json = request
-            .json::<serde_json::Value>()
-            .await?;
-        Ok(deserialize::<DataAndMetaWrapper::<Faction>>(json)?.inner())
+        match response.status().as_u16() {
+            200 => {
+                let json = response
+                    .json::<serde_json::Value>()
+                    .await?;
+                Ok(<DataAndMetaWrapper::<Faction>>::deserialize(json)?.inner())
+            }
+            other => {
+                let json = response
+                    .json::<serde_json::Value>()
+                    .await?;
+                Err(crate::Error::FromServerError(<ServerError>::deserialize(json)?))
+            }
+        }
     }
 
     /// View the details of a faction.
     pub async fn get_faction(&self, faction_symbol: &str) -> Result<Faction, crate::Error> {
-        let request = self.get(&format!("factions/{faction_symbol}"))
+        let response = self.get(&format!("factions/{faction_symbol}"))
             .send()
             .await?;
-        let json = request
-            .json::<serde_json::Value>()
-            .await?;
-        Ok(deserialize::<DataWrapper::<Faction>>(json)?.inner())
+        match response.status().as_u16() {
+            200 => {
+                let json = response
+                    .json::<serde_json::Value>()
+                    .await?;
+                Ok(<DataWrapper::<Faction>>::deserialize(json)?.inner())
+            }
+            other => {
+                let json = response
+                    .json::<serde_json::Value>()
+                    .await?;
+                Err(crate::Error::FromServerError(<ServerError>::deserialize(json)?))
+            }
+        }
     }
 }
 
@@ -144,24 +182,44 @@ impl crate::SpaceTradersClient<Anonymous> {
     /// Return a paginated list of all the factions in the game.
     pub async fn list_factions(&self, page_limit: Option<usize>, page_index: Option<usize>) -> Result<(Vec<Faction>, Meta), crate::Error> {
         let (limit, page) = page_limit_and_index(page_limit, page_index);
-        let request = self.get("factions")
+        let response = self.get("factions")
             .query(&[("limit", limit), ("page", page)])
             .send()
             .await?;
-        let json = request
-            .json::<serde_json::Value>()
-            .await?;
-        Ok(deserialize::<DataAndMetaWrapper::<Faction>>(json)?.inner())
+        match response.status().as_u16() {
+            200 => {
+                let json = response
+                    .json::<serde_json::Value>()
+                    .await?;
+                Ok(<DataAndMetaWrapper::<Faction>>::deserialize(json)?.inner())
+            }
+            other => {
+                let json = response
+                    .json::<serde_json::Value>()
+                    .await?;
+                Err(crate::Error::FromServerError(<ServerError>::deserialize(json)?))
+            }
+        }
     }
 
     /// View the details of a faction.
     pub async fn get_faction(&self, faction_symbol: &str) -> Result<Faction, crate::Error> {
-        let request = self.get(&format!("factions/{faction_symbol}"))
+        let response = self.get(&format!("factions/{faction_symbol}"))
             .send()
             .await?;
-        let json = request
-            .json::<serde_json::Value>()
-            .await?;
-        Ok(deserialize::<DataWrapper::<Faction>>(json)?.inner())
+        match response.status().as_u16() {
+            200 => {
+                let json = response
+                    .json::<serde_json::Value>()
+                    .await?;
+                Ok(<DataWrapper::<Faction>>::deserialize(json)?.inner())
+            }
+            other => {
+                let json = response
+                    .json::<serde_json::Value>()
+                    .await?;
+                Err(crate::Error::FromServerError(<ServerError>::deserialize(json)?))
+            }
+        }
     }
 }

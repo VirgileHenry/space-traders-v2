@@ -8,3 +8,4 @@ pub(crate) mod utils;
 
 
 pub use error::Error;
+pub use client::SpaceTradersClient;

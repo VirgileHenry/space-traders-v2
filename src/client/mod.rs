@@ -47,6 +47,8 @@ impl SpaceTradersClient<Anonymous> {
 
     pub(crate) fn post(&self, path: &str) -> reqwest::RequestBuilder {
         self.http_client.post(format!("{}/{}", SPACE_TRADERS_API, path))
+            .header("Accept", "application/json")
+            .header("Content-Type", "application/json")
     }
 }
 

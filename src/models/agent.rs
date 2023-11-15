@@ -42,7 +42,7 @@ impl crate::client::SpaceTradersClient<Authenticated> {
     pub async fn list_agents(&self, page_limit: Option<usize>, page_index: Option<usize>) -> Result<(Vec<Agent>, Meta), crate::Error> {
         let (limit, page) = page_limit_and_index(page_limit, page_index);
         let request = self.get("agents")
-        .query(&[("limit", limit), ("page", page)])
+            .query(&[("limit", limit), ("page", page)])
             .send()
             .await?;
         let json = request
@@ -68,7 +68,7 @@ impl crate::client::SpaceTradersClient<Anonymous> {
     pub async fn list_agents(&self, page_limit: Option<usize>, page_index: Option<usize>) -> Result<(Vec<Agent>, Meta), crate::Error> {
         let (limit, page) = page_limit_and_index(page_limit, page_index);
         let request = self.get("agents")
-        .query(&[("limit", limit), ("page", page)])
+            .query(&[("limit", limit), ("page", page)])
             .send()
             .await?;
         let json = request

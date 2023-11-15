@@ -37,9 +37,7 @@ impl crate::client::SpaceTradersClient<Authenticated> {
             .await?;
         Ok(deserialize::<DataWrapper::<Agent>>(json)?.inner())
     }
-}
 
-impl crate::client::SpaceTradersClient<Authenticated> {
     /// Fetch agents details.
     pub async fn list_agents(&self) -> Result<(Vec<Agent>, Meta), crate::Error> {
         let request = self.get("agents")
@@ -50,22 +48,7 @@ impl crate::client::SpaceTradersClient<Authenticated> {
             .await?;
         Ok(deserialize::<DataAndMetaWrapper::<Agent>>(json)?.inner())
     }
-}
 
-impl crate::client::SpaceTradersClient<Anonymous> {
-    /// Fetch agents details.
-    pub async fn list_agents(&self) -> Result<(Vec<Agent>, Meta), crate::Error> {
-        let request = self.get("agents")
-            .send()
-            .await?;
-        let json = request
-            .json::<serde_json::Value>()
-            .await?;
-        Ok(deserialize::<DataAndMetaWrapper::<Agent>>(json)?.inner())
-    }
-}
-
-impl crate::client::SpaceTradersClient<Authenticated> {
     /// Fetch agent details.
     pub async fn get_public_agent(&self, agent_symbol: &str) -> Result<Agent, crate::Error> {
         let request = self.get(&format!("agents/{agent_symbol}"))
@@ -79,6 +62,17 @@ impl crate::client::SpaceTradersClient<Authenticated> {
 }
 
 impl crate::client::SpaceTradersClient<Anonymous> {
+    /// Fetch agents details.
+    pub async fn list_agents(&self) -> Result<(Vec<Agent>, Meta), crate::Error> {
+        let request = self.get("agents")
+            .send()
+            .await?;
+        let json = request
+            .json::<serde_json::Value>()
+            .await?;
+        Ok(deserialize::<DataAndMetaWrapper::<Agent>>(json)?.inner())
+    }
+
     /// Fetch agent details.
     pub async fn get_public_agent(&self, agent_symbol: &str) -> Result<Agent, crate::Error> {
         let request = self.get(&format!("agents/{agent_symbol}"))

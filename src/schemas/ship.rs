@@ -1,0 +1,15 @@
+pub mod ship_cargo;
+pub mod ship_condition;
+pub mod ship_crew;
+pub mod ship_engine;
+pub mod ship_frame;
+pub mod ship_fuel;
+pub mod ship_modification_transaction;
+pub mod ship_module;
+pub mod ship_mount;
+pub mod ship_nav;
+pub mod ship_reactor;
+pub mod ship_registration;
+pub mod ship_requirements;
+pub mod ship_role;
+pub mod ship_type;

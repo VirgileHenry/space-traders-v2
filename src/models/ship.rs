@@ -11,6 +11,7 @@ pub mod reactor;
 pub mod refining;
 pub mod registration;
 pub mod requirements;
+pub mod survey;
 
 use serde::{Serialize, Deserialize};
 
@@ -19,7 +20,7 @@ use crate::{
     utils::{
         pagination::page_limit_and_index,
         wrapper::{
-            DataAndMetaWrapper,
+            PaginationWrapper,
             DataWrapper
         }
     }, error::server_error::ServerError
@@ -89,7 +90,7 @@ impl crate::SpaceTradersClient<Authenticated> {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                Ok(<DataAndMetaWrapper::<Ship>>::deserialize(json)?.inner())
+                Ok(<PaginationWrapper::<Ship>>::deserialize(json)?.inner())
             }
             other => {
                 let json = response
@@ -194,6 +195,33 @@ impl crate::SpaceTradersClient<Authenticated> {
             }
         }
     }
+
+    /// Attempt to dock your ship at its current location. Docking will only succeed if your ship is capable of docking at the time of the request.
+    ///
+    /// Docked ships can access elements in their current location, such as the market or a shipyard, but cannot do actions that require the ship to be above surface such as navigating or extracting.
+    ///
+    /// The endpoint is idempotent - successive calls will succeed even if the ship is already docked.
+    pub async fn dock_ship(&self, ship_symbol: &str) -> Result<Nav, crate::Error> {
+        let response = self.post(&format!("my/ships/{ship_symbol}/dock"))
+            .send()
+            .await?;
+        match response.status().as_u16() {
+            200 => {
+                let json = response
+                    .json::<serde_json::Value>()
+                    .await?;
+                Ok(<DataWrapper::<Nav>>::deserialize(json)?.inner())
+            }
+            other => {
+                let json = response
+                    .json::<serde_json::Value>()
+                    .await?;
+                Err(crate::Error::FromServerError(<ServerError>::deserialize(json)?))
+            }
+        }
+    }
+
+    
 
 
 }

@@ -19,6 +19,7 @@ pub enum FlightMode {
     Burn,
 }
 
+
 #[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Nav {

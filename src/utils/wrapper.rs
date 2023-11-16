@@ -23,39 +23,15 @@ impl<T: Debug + Clone> DataWrapper<T> {
 /// Wrapper arround the data scheme: { "data": [...], "meta": {...} }
 #[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct DataAndMetaWrapper<T: Debug + Clone> {
+pub struct PaginationWrapper<T: Debug + Clone> {
     data: Vec<T>,
     meta: Meta,
 }
 
-impl<T: Debug + Clone> DataAndMetaWrapper<T> {
+impl<T: Debug + Clone> PaginationWrapper<T> {
     pub fn inner(self) -> (Vec<T>, Meta) {
         (self.data, self.meta)
     }
 }
 
-/// Wrapper arround the error scheme: { "error": {...} }
-#[derive(Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct ErrorWrapper<T: Debug + Clone> {
-    error: T,
-}
 
-impl<T: Debug + Clone> ErrorWrapper<T> {
-    pub fn inner(self) -> T {
-        self.error
-    }
-}
-
-/// Wrapper arround the array scheme: [...]
-#[derive(Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct ArrayWrapper<T: Debug + Clone> {
-    array: Vec<T>
-}
-
-impl<T: Debug + Clone> ArrayWrapper<T> {
-    pub fn inner(self) -> Vec<T> {
-        self.array
-    }
-}

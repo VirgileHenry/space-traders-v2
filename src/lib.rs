@@ -1,11 +1,9 @@
 
 pub mod client;
-#[allow(unused)] // temp
-pub mod models;
 pub mod error;
-#[allow(unused)] // temp
+pub mod models;
+pub mod schemas;
 pub(crate) mod utils;
-
 
 pub use error::Error;
 pub use client::SpaceTradersClient;

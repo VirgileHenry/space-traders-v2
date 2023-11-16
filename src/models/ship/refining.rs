@@ -5,7 +5,7 @@ use crate::{
     utils::wrapper::DataWrapper,
     models::{
         cargo::Cargo,
-        cooldown::Cooldown
+        cooldown::Cooldown, resource::Resource
     },
     error::server_error::ServerError
 };
@@ -23,6 +23,25 @@ pub enum RefinedGoodType {
     Uranite,
     Meritium,
     Fuel,
+}
+
+pub struct NotARefinedGood;
+impl TryFrom<Resource> for RefinedGoodType {
+    type Error = NotARefinedGood;
+    fn try_from(value: Resource) -> Result<Self, Self::Error> {
+        match value {
+            Resource::Iron => Ok(RefinedGoodType::Iron),
+            Resource::Copper => Ok(RefinedGoodType::Copper),
+            Resource::Silver => Ok(RefinedGoodType::Silver),
+            Resource::Gold => Ok(RefinedGoodType::Gold),
+            Resource::Aluminium => Ok(RefinedGoodType::Aluminium),
+            Resource::Platinium => Ok(RefinedGoodType::Platinium),
+            Resource::Uranite => Ok(RefinedGoodType::Uranite),
+            Resource::Meritium => Ok(RefinedGoodType::Meritium),
+            Resource::Fuel => Ok(RefinedGoodType::Fuel),
+            _ => Err(NotARefinedGood),
+        }
+    }
 }
 
 #[derive(Deserialize, Debug, Clone)]

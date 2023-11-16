@@ -7,7 +7,7 @@ use crate::{
     },
     utils::{
         wrapper::{
-            DataAndMetaWrapper,
+            PaginationWrapper,
             DataWrapper
         },
         pagination::page_limit_and_index
@@ -145,7 +145,7 @@ impl crate::SpaceTradersClient<Authenticated> {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                Ok(<DataAndMetaWrapper::<Faction>>::deserialize(json)?.inner())
+                Ok(<PaginationWrapper::<Faction>>::deserialize(json)?.inner())
             }
             other => {
                 let json = response
@@ -191,7 +191,7 @@ impl crate::SpaceTradersClient<Anonymous> {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                Ok(<DataAndMetaWrapper::<Faction>>::deserialize(json)?.inner())
+                Ok(<PaginationWrapper::<Faction>>::deserialize(json)?.inner())
             }
             other => {
                 let json = response

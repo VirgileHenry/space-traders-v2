@@ -1,2 +1,24 @@
 pub mod market_trade_good;
 pub mod market_transaction;
+
+use serde::Deserialize;
+use self::{
+    market_transaction::MarketTransaction,
+    market_trade_good::MarketTradeGood
+};
+use super::trade_good::TradeGood;
+
+#[derive(Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct Market {
+    /// The symbol of the market. The symbol is the same as the waypoint where the market is located.
+    symbol: String,
+    /// The list of goods that are exported from this market.
+    exports: Vec<TradeGood>,
+    /// The list of goods that are bought and sold between agents at this market.
+    exchange: Vec<TradeGood>,
+    /// The list of recent transactions at this market. Visible only when a ship is present at the market.
+    transactions: Vec<MarketTransaction>,
+    /// The list of goods that are traded at this market. Visible only when a ship is present at the market.
+    trade_goods: Vec<MarketTradeGood>,
+}

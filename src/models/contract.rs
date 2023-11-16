@@ -4,7 +4,7 @@ use crate::{
     client::Authenticated,
     utils::{
         wrapper::{
-            DataAndMetaWrapper,
+            PaginationWrapper,
             DataWrapper
         }, pagination::page_limit_and_index
     }, error::server_error::ServerError
@@ -12,30 +12,7 @@ use crate::{
 
 use super::meta::Meta;
 
-/// Type of contract.
-#[derive(Deserialize, Debug, Clone)]
-#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-pub enum ContractType {
-    Procurement,
-    Transport,
-    Shuttle,
-}
 
-/// Contract details.
-#[derive(Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct Contract {
-    id: String,
-    faction_symbol: String,
-    #[serde(rename = "type")]
-    contract_type: ContractType,
-    terms: ContractTerms,
-    accepted: bool,
-    fulfilled: bool,
-    #[warn(deprecated)]
-    expiration: String,
-    deadline_to_accept: Option<String>,
-}
 
 #[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -45,21 +22,6 @@ pub struct ContractTerms {
     deliver: Vec<ContractCargo>,
 }
 
-#[derive(Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct ContractPayment {
-    on_accepted: i64,
-    on_fulfilled: i64,
-}
-
-#[derive(Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct ContractCargo {
-    trade_symbol: String,
-    destination_symbol: String,
-    units_required: i64,
-    units_fulfilled: i64,
-}
 
 /// Wrapper around a contract and a cargo.
 /// Value returned by deliver_cargo_to_contract().
@@ -92,7 +54,7 @@ impl crate::SpaceTradersClient<Authenticated> {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                Ok(<DataAndMetaWrapper::<Contract>>::deserialize(json)?.inner())
+                Ok(<PaginationWrapper::<Contract>>::deserialize(json)?.inner())
             }
             other => {
                 let json = response

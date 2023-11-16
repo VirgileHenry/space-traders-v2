@@ -1,37 +1,18 @@
 use serde::Deserialize;
-
 use crate::{
     utils::{
-        wrapper::{
-            DataWrapper,
-            PaginationWrapper
-        },
+        wrapper::{DataWrapper, PaginationWrapper},
         pagination::page_limit_and_index
     },
-    client::{
-        AuthState,
-        Authenticated, Anonymous
-    }, error::server_error::ServerError
+    client::{Authenticated, Anonymous},
+    error::server_error::ServerError,
+    schemas::{agent::Agent,meta::Meta},
 };
 
-use super::meta::Meta;
-
-/// Represent a in-game agent.
-#[derive(Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct Agent {
-    /// The account id is only set for our own agents ? 
-    account_id: Option<String>,
-    symbol: String,
-    headquarters: String,
-    credits: i64,
-    starting_faction: String,
-    ship_count: u64,
-}
 
 impl crate::client::SpaceTradersClient<Authenticated> {
     /// Fetch your agent's details.
-    pub async fn get_agent(&self) -> Result<Agent, crate::Error> {
+    pub async fn get_agent(&self) -> Result<Agent, crate::error::Error> {
         let response = self.get("my/agent")
             .send()
             .await?;
@@ -42,17 +23,18 @@ impl crate::client::SpaceTradersClient<Authenticated> {
                     .await?;
                 Ok(<DataWrapper::<Agent>>::deserialize(json)?.inner())
             }
-            other => {
+            status => {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                Err(crate::Error::FromServerError(<ServerError>::deserialize(json)?))
+                let server_error = <ServerError>::deserialize(json)?; 
+                Err(crate::error::Error::from((status, server_error)))
             }
         }
     }
 
     /// Fetch agents details.
-    pub async fn list_agents(&self, page_limit: Option<usize>, page_index: Option<usize>) -> Result<(Vec<Agent>, Meta), crate::Error> {
+    pub async fn list_agents(&self, page_limit: Option<usize>, page_index: Option<usize>) -> Result<(Vec<Agent>, Meta), crate::error::Error> {
         let (limit, page) = page_limit_and_index(page_limit, page_index);
         let response = self.get("agents")
             .query(&[("limit", limit), ("page", page)])
@@ -65,17 +47,18 @@ impl crate::client::SpaceTradersClient<Authenticated> {
                     .await?;
                 Ok(<PaginationWrapper::<Agent>>::deserialize(json)?.inner())
             }
-            other => {
+            status => {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                Err(crate::Error::FromServerError(<ServerError>::deserialize(json)?))
+                let server_error = <ServerError>::deserialize(json)?; 
+                Err(crate::error::Error::from((status, server_error)))
             }
         }
     }
 
     /// Fetch agent details.
-    pub async fn get_public_agent(&self, agent_symbol: &str) -> Result<Agent, crate::Error> {
+    pub async fn get_public_agent(&self, agent_symbol: &str) -> Result<Agent, crate::error::Error> {
         let response = self.get(&format!("agents/{agent_symbol}"))
             .send()
             .await?;
@@ -86,11 +69,12 @@ impl crate::client::SpaceTradersClient<Authenticated> {
                     .await?;
                 Ok(<DataWrapper::<Agent>>::deserialize(json)?.inner())
             }
-            other => {
+            status => {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                Err(crate::Error::FromServerError(<ServerError>::deserialize(json)?))
+                let server_error = <ServerError>::deserialize(json)?; 
+                Err(crate::error::Error::from((status, server_error)))
             }
         }
     }
@@ -98,7 +82,7 @@ impl crate::client::SpaceTradersClient<Authenticated> {
 
 impl crate::client::SpaceTradersClient<Anonymous> {
     /// Fetch agents details.
-    pub async fn list_agents(&self, page_limit: Option<usize>, page_index: Option<usize>) -> Result<(Vec<Agent>, Meta), crate::Error> {
+    pub async fn list_agents(&self, page_limit: Option<usize>, page_index: Option<usize>) -> Result<(Vec<Agent>, Meta), crate::error::Error> {
         let (limit, page) = page_limit_and_index(page_limit, page_index);
         let response = self.get("agents")
             .query(&[("limit", limit), ("page", page)])
@@ -111,17 +95,18 @@ impl crate::client::SpaceTradersClient<Anonymous> {
                     .await?;
                 Ok(<PaginationWrapper::<Agent>>::deserialize(json)?.inner())
             }
-            other => {
+            status => {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                Err(crate::Error::FromServerError(<ServerError>::deserialize(json)?))
+                let server_error = <ServerError>::deserialize(json)?; 
+                Err(crate::error::Error::from((status, server_error)))
             }
         }
     }
 
     /// Fetch agent details.
-    pub async fn get_public_agent(&self, agent_symbol: &str) -> Result<Agent, crate::Error> {
+    pub async fn get_public_agent(&self, agent_symbol: &str) -> Result<Agent, crate::error::Error> {
         let response = self.get(&format!("agents/{agent_symbol}"))
             .send()
             .await?;
@@ -132,11 +117,12 @@ impl crate::client::SpaceTradersClient<Anonymous> {
                     .await?;
                 Ok(<DataWrapper::<Agent>>::deserialize(json)?.inner())
             }
-            other => {
+            status => {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                Err(crate::Error::FromServerError(<ServerError>::deserialize(json)?))
+                let server_error = <ServerError>::deserialize(json)?; 
+                Err(crate::error::Error::from((status, server_error)))
             }
         }
     }

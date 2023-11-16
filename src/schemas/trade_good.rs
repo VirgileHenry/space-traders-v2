@@ -6,9 +6,9 @@ use super::trade_symbol::TradeSymbol;
 #[serde(rename_all = "camelCase")]
 pub struct TradeGood {
     /// The good's symbol.
-    symbol: TradeSymbol,
+    pub symbol: TradeSymbol,
     /// The name of the good.
-    name: String,
+    pub name: String,
     /// The description of the good.
-    description: String,
+    pub description: String,
 }

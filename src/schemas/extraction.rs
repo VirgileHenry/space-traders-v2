@@ -8,8 +8,8 @@ use self::extraction_yield::ExtractionYield;
 #[serde(rename_all = "camelCase")]
 pub struct Extraction {
     /// Symbol of the ship that executed the extraction.
-    ship_symbol: String,
+    pub ship_symbol: String,
     /// Yields from the extract operation.
     #[serde(rename = "yield")]
-    extraction_yield: ExtractionYield,
+    pub extraction_yield: ExtractionYield,
 }

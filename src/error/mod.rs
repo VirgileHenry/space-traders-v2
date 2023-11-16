@@ -5,20 +5,26 @@ pub mod code;
 
 #[derive(Debug)]
 pub enum Error {
-    FromServerError(ServerError),
-    RequestError(reqwest::Error),
+    ServerErrorResponse {
+        status: u16,
+        error: ServerError
+    },
+    ErrorSendingRequest(reqwest::Error),
     JsonParsingError(serde_json::Error),
 }
 
 impl From<reqwest::Error> for Error {
     fn from(value: reqwest::Error) -> Self {
-        Error::RequestError(value)
+        Error::ErrorSendingRequest(value)
     }
 }
 
-impl From<ServerError> for Error {
-    fn from(value: ServerError) -> Self {
-        Error::FromServerError(value)
+impl From<(u16, ServerError)> for Error {
+    fn from((status, error): (u16, ServerError)) -> Self {
+        Error::ServerErrorResponse {
+            status,
+            error,
+        }
     }
 }
 

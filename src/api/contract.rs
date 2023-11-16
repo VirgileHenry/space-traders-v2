@@ -1,49 +1,42 @@
 use serde::Deserialize;
 
 use crate::{
-    client::Authenticated,
+    client::{
+        Authenticated,
+        SpaceTradersClient
+    },
     utils::{
         wrapper::{
             PaginationWrapper,
             DataWrapper
-        }, pagination::page_limit_and_index
-    }, error::server_error::ServerError
+        },
+        pagination::page_limit_and_index
+    },
+    error::server_error::ServerError,
+    schemas::{
+        contract::Contract,
+        meta::Meta, agent::Agent, ship::ship_cargo::ShipCargo
+    }
 };
 
-use super::meta::Meta;
-
-
-
-#[derive(Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct ContractTerms {
-    deadline: String,
-    payment: ContractPayment,
-    deliver: Vec<ContractCargo>,
+/// Wrapper around an agent and a contract.
+#[derive(Deserialize, Clone, Debug)]
+pub struct AgentAndContract {
+    pub agent: Agent,
+    pub contract: Contract,
 }
-
 
 /// Wrapper around a contract and a cargo.
-/// Value returned by deliver_cargo_to_contract().
-#[derive(Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
+#[derive(Deserialize, Clone, Debug)]
 pub struct ContractAndCargo {
-    contract: Contract,
-    cargo: super::cargo::Cargo,
+    pub contract: Contract,
+    pub cargo: ShipCargo,
 }
 
-/// Wrapper around a agent and a contract.
-/// Value returned by fulfill_contract().
-#[derive(Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct AgentAndContract {
-    agent: super::agent::Agent,
-    contract: Contract,
-}
 
-impl crate::SpaceTradersClient<Authenticated> {
+impl SpaceTradersClient<Authenticated> {
     /// Return a paginated list of all your contracts.
-    pub async fn list_contracts(&self, page_limit: Option<usize>, page_index: Option<usize>) -> Result<(Vec<Contract>, Meta), crate::Error> {
+    pub async fn list_contracts(&self, page_limit: Option<usize>, page_index: Option<usize>) -> Result<(Vec<Contract>, Meta), crate::error::Error> {
         let (limit, page) = page_limit_and_index(page_limit, page_index);
         let response = self.get("my/contracts")
             .query(&[("limit", limit), ("page", page)])
@@ -56,17 +49,18 @@ impl crate::SpaceTradersClient<Authenticated> {
                     .await?;
                 Ok(<PaginationWrapper::<Contract>>::deserialize(json)?.inner())
             }
-            other => {
+            status => {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                Err(crate::Error::FromServerError(<ServerError>::deserialize(json)?))
+                let server_error = <ServerError>::deserialize(json)?; 
+                Err(crate::error::Error::from((status, server_error)))
             }
         }
     }
 
     /// Get the details of a contract by ID.
-    pub async fn get_contract(&self, contract_id: &str) -> Result<Contract, crate::Error> {
+    pub async fn get_contract(&self, contract_id: &str) -> Result<Contract, crate::error::Error> {
         let response = self.get(&format!("my/contracts/{contract_id}"))
             .send()
             .await?;
@@ -77,11 +71,12 @@ impl crate::SpaceTradersClient<Authenticated> {
                     .await?;
                 Ok(<DataWrapper::<Contract>>::deserialize(json)?.inner())
             }
-            other => {
+            status => {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                Err(crate::Error::FromServerError(<ServerError>::deserialize(json)?))
+                let server_error = <ServerError>::deserialize(json)?; 
+                Err(crate::error::Error::from((status, server_error)))
             }
         }
     }
@@ -90,7 +85,7 @@ impl crate::SpaceTradersClient<Authenticated> {
     /// 
     /// You can only accept contracts that were offered to you,
     /// were not accepted yet, and whose deadlines has not passed yet.
-    pub async fn accept_contract(&self, contract_id: &str) -> Result<AgentAndContract, crate::Error> {
+    pub async fn accept_contract(&self, contract_id: &str) -> Result<AgentAndContract, crate::error::Error> {
         let response = self.post(&format!("my/contracts/{contract_id}/accept"))
             .send()
             .await?;
@@ -101,11 +96,12 @@ impl crate::SpaceTradersClient<Authenticated> {
                     .await?;
                 Ok(<DataWrapper::<AgentAndContract>>::deserialize(json)?.inner())
             }
-            other => {
+            status => {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                Err(crate::Error::FromServerError(<ServerError>::deserialize(json)?))
+                let server_error = <ServerError>::deserialize(json)?; 
+                Err(crate::error::Error::from((status, server_error)))
             }
         }
     }
@@ -115,7 +111,7 @@ impl crate::SpaceTradersClient<Authenticated> {
     /// (denoted in the delivery terms as destinationSymbol of a contract)
     /// and must have a number of units of a good required by this contract in its cargo.
     /// Cargo that was delivered will be removed from the ship's cargo.
-    pub async fn deliver_cargo_to_contract(&self, contract_id: &str, ship_symbol: &str, trade_symbol: &str, units: u64) -> Result<ContractAndCargo, crate::Error> {
+    pub async fn deliver_cargo_to_contract(&self, contract_id: &str, ship_symbol: &str, trade_symbol: &str, units: u64) -> Result<ContractAndCargo, crate::error::Error> {
         let body = serde_json::json!({
             "shipSymbol": ship_symbol,
             "tradeSymbol": trade_symbol,
@@ -132,18 +128,19 @@ impl crate::SpaceTradersClient<Authenticated> {
                     .await?;
                 Ok(<DataWrapper::<ContractAndCargo>>::deserialize(json)?.inner())
             }
-            other => {
+            status => {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                Err(crate::Error::FromServerError(<ServerError>::deserialize(json)?))
+                let server_error = <ServerError>::deserialize(json)?; 
+                Err(crate::error::Error::from((status, server_error)))
             }
         }
     }
 
     /// Fulfill a contract.
     /// Can only be used on contracts that have all of their delivery terms fulfilled.
-    pub async fn fulfill_contract(&self, contract_id: &str) -> Result<AgentAndContract, crate::Error> {
+    pub async fn fulfill_contract(&self, contract_id: &str) -> Result<AgentAndContract, crate::error::Error> {
         let response = self.post(&format!("my/contracts/{contract_id}/fulfill"))
             .send()
             .await?;
@@ -154,11 +151,12 @@ impl crate::SpaceTradersClient<Authenticated> {
                     .await?;
                 Ok(<DataWrapper::<AgentAndContract>>::deserialize(json)?.inner())
             }
-            other => {
+            status => {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                Err(crate::Error::FromServerError(<ServerError>::deserialize(json)?))
+                let server_error = <ServerError>::deserialize(json)?; 
+                Err(crate::error::Error::from((status, server_error)))
             }
         }
     }

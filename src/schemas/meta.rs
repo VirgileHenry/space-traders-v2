@@ -6,9 +6,9 @@ use serde::Deserialize;
 #[serde(rename_all = "camelCase")]
 pub struct Meta {
     /// Shows the total amount of items of this kind that exist.
-    total: u64,
+    pub total: u64,
     /// A page denotes an amount of items, offset from the first item. Each page holds an amount of items equal to the limit.
-    page: NonZeroU64,
+    pub page: NonZeroU64,
     /// The amount of items in each page. Limits how many items can be fetched at once.
-    limit: NonZeroU64,
+    pub limit: NonZeroU64,
 }

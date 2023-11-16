@@ -12,7 +12,7 @@ use self::{
 /// The navigation information of the ship.
 #[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct Nav {
+pub struct ShipNav {
     /// The system symbol of the ship's current location.
     pub system_symbol: String,
     /// The waypoint symbol of the ship's current location, or if the ship is in-transit, the waypoint symbol of the ship's destination.

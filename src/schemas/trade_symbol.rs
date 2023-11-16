@@ -1,9 +1,6 @@
-use serde::{
-    Serialize,
-    Deserialize,
-};
+use serde::Deserialize;
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Deserialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum TradeSymbol {
     PreciousStones,
@@ -20,7 +17,7 @@ pub enum TradeSymbol {
     IronOre,
     Copper,
     CopperOre,
-    Aluminium,
+    Aluminum,
     AluminumOre,
     Silver,
     SilverOre,
@@ -29,7 +26,7 @@ pub enum TradeSymbol {
     Platinum,
     PlatinumOre,
     Diamonds,
-    Uranie,
+    Uranite,
     UraniteOre,
     Meritium,
     MeritiumOre,

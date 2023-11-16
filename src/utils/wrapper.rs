@@ -1,11 +1,11 @@
-use std::fmt::Debug;
-use serde::Deserialize;
-
-use crate::models::meta::Meta;
-
 //* Wrappers are generic structs over common json schemes.
 //* They allow easier deserialization and avoid boilerplates.
 //* Otherwise, we would have to implement lot of redondant structs.
+
+
+use std::fmt::Debug;
+use serde::Deserialize;
+use crate::schemas::meta::Meta;
 
 /// Wrapper arround the data scheme: { "data": {...} }
 #[derive(Deserialize, Debug, Clone)]

@@ -1,24 +1,31 @@
 use serde::Deserialize;
 use crate::{
     utils::wrapper::DataWrapper,
-    client::{
-        AuthState,
-        SpaceTradersClient,
-        Anonymous,
-        Authenticated
-    }, error::server_error::ServerError
+    client::Anonymous,
+    error::server_error::ServerError,
+    schemas::{
+        agent::Agent,
+        contract::Contract,
+        faction::Faction,
+        ship::Ship
+    },
 };
-
-use super::agent::Agent;
 
 /// A registered agent is an agent that have juste been registered.
 /// It is a wrapper around an agent and additionnal info regarding creation, like auth token.
 #[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct RegisteredAgent {
-    agent: Agent,
-    token: String,
-    // contract: Contract,
+    /// The newly created agent.
+    pub agent: Agent,
+    /// The secret auth token that this agent auth with. 
+    pub token: String,
+    /// The starting contract of this agent.
+    pub contract: Contract,
+    /// The starting faction of this agent.
+    pub faction: Faction,
+    /// The sole starting ship of this agent.
+    pub ship: Ship,
 }
 
 impl crate::client::SpaceTradersClient<Anonymous> {
@@ -32,7 +39,7 @@ impl crate::client::SpaceTradersClient<Anonymous> {
     /// a contract with their starting faction,
     /// a command ship that can fly across space with advanced capabilities,
     /// a small probe ship that can be used for reconnaissance, and 150,000 credits.
-    pub async fn create_agent(&self, email: &str, faction: &str, symbol: &str) -> Result<RegisteredAgent, crate::Error> {
+    pub async fn create_agent(&self, email: &str, faction: &str, symbol: &str) -> Result<RegisteredAgent, crate::error::Error> {
         let body = serde_json::json!({
             "faction": faction,
             "symbol": symbol,
@@ -49,11 +56,12 @@ impl crate::client::SpaceTradersClient<Anonymous> {
                     .await?;
                 Ok(<DataWrapper::<RegisteredAgent>>::deserialize(json)?.inner())
             }
-            other => {
+            status => {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                Err(crate::Error::FromServerError(<ServerError>::deserialize(json)?))
+                let server_error = <ServerError>::deserialize(json)?; 
+                Err(crate::error::Error::from((status, server_error)))
             }
         }
     }

@@ -12,13 +12,13 @@ use super::trade_good::TradeGood;
 #[serde(rename_all = "camelCase")]
 pub struct Market {
     /// The symbol of the market. The symbol is the same as the waypoint where the market is located.
-    symbol: String,
+    pub symbol: String,
     /// The list of goods that are exported from this market.
-    exports: Vec<TradeGood>,
+    pub exports: Vec<TradeGood>,
     /// The list of goods that are bought and sold between agents at this market.
-    exchange: Vec<TradeGood>,
+    pub exchange: Vec<TradeGood>,
     /// The list of recent transactions at this market. Visible only when a ship is present at the market.
-    transactions: Vec<MarketTransaction>,
+    pub transactions: Vec<MarketTransaction>,
     /// The list of goods that are traded at this market. Visible only when a ship is present at the market.
-    trade_goods: Vec<MarketTradeGood>,
+    pub trade_goods: Vec<MarketTradeGood>,
 }

@@ -25,7 +25,7 @@ pub enum ShipFrameType {
 /// The frame of the ship. The frame determines the number of modules and mounting points of the ship, as well as base fuel capacity. As the condition of the frame takes more wear, the ship will become more sluggish and less maneuverable.
 #[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct Frame {
+pub struct ShipFrame {
     /// Symbol of the frame.
     pub symbol: ShipFrameType,
     /// Name of the frame.

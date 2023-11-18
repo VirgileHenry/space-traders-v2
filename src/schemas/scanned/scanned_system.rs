@@ -1,14 +1,8 @@
-pub mod system_faction;
-pub mod system_type;
-pub mod system_waypoint;
-
 use serde::Deserialize;
-use self::{
-    system_type::SystemType,
-    system_waypoint::SystemWaypoint,
-    system_faction::SystemFaction
-};
 
+use crate::schemas::system::system_type::SystemType;
+
+/// Details of a system was that scanned.
 #[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct System {
@@ -24,7 +18,5 @@ pub struct System {
     /// Relative position of the system in the sector in the y axis.
     pub y: i64,
     /// Waypoints in this system.
-    pub waypoints: Vec<SystemWaypoint>,
-    /// Factions that control this system.
-    pub factions: Vec<SystemFaction>,
+    pub distance: i64,
 }

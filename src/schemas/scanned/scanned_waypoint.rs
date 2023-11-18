@@ -1,30 +1,36 @@
 use serde::Deserialize;
 
-use crate::schemas::ship::{
-    ship_registration::Registration,
-    ship_nav::ShipNav,
-    ship_frame::ShipFrame,
-    ship_reactor::ShipReactor,
-    ship_engine::ShipEngine,
-    ship_mount::ShipMount
+use crate::schemas::{
+    waypoint::{
+        waypoint_type::WaypointType,
+        waypoint_orbital::WaypointOrbital,
+        waypoint_trait::WaypointTrait
+    },
+    faction::faction_symbol::FactionSymbol,
+    chart::Chart
 };
 
-/// The ship that was scanned. Details include information about the ship that could be detected by the scanner.
+/// A waypoint that was scanned by a ship.
 #[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct Ship {
-    /// The globally unique identifier of the ship in the following format: [AGENT_SYMBOL]-[HEX_ID]
+pub struct ScannedWaypoint {
+    /// Symbol fo the waypoint.
     pub symbol: String,
-    /// The public registration information of the ship.
-    pub registration: Registration,
-    /// The navigation information of the ship.
-    pub nav: ShipNav,
-    /// The frame of the ship. The frame determines the number of modules and mounting points of the ship, as well as base fuel capacity. As the condition of the frame takes more wear, the ship will become more sluggish and less maneuverable.
-    pub frame: Option<ShipFrame>,
-    /// The reactor of the ship. The reactor is responsible for powering the ship's systems and weapons.
-    pub reactor: Option<ShipReactor>,
-    /// The engine determines how quickly a ship travels between waypoints.
-    pub engine: ShipEngine,
-    /// Mounts installed in this ship.
-    pub mounts: Option<Vec<ShipMount>>,
+    /// The type of waypoint.
+    #[serde(rename = "type")]
+    pub waypoint_type: WaypointType,
+    /// The symbol of the system this waypoint belongs to.
+    pub system_symbol: String,
+    /// Relative position of the waypoint on the system's x axis. This is not an absolute position in the universe.
+    pub x: i64,
+    /// Relative position of the waypoint on the system's y axis. This is not an absolute position in the universe.
+    pub y: i64,
+    /// Waypoints that orbit this waypoint.
+    pub orbitals: Vec<WaypointOrbital>,
+    /// The symbol of the parent waypoint, if this waypoint is in orbit around another waypoint. Otherwise this value is undefined.
+    pub faction: FactionSymbol,
+    /// The traits of the waypoint.
+    pub traits: Vec<WaypointTrait>,
+    /// The chart of a system or waypoint, which makes the location visible to other agents.
+    pub chart: Option<Chart>,
 }

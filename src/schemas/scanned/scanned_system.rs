@@ -5,7 +5,7 @@ use crate::schemas::system::system_type::SystemType;
 /// Details of a system was that scanned.
 #[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct System {
+pub struct ScannedSystem {
     /// The symbol of the system.
     pub symbol: String,
     /// The symbol of the sector.

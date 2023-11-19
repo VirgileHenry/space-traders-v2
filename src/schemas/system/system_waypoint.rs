@@ -10,6 +10,7 @@ pub struct SystemWaypoint {
     /// The symbol of the waypoint.
     pub symbol: String,
     /// The type of waypoint.
+    #[serde(rename = "type")]
     pub waypoint_type: WaypointType,
     /// Relative position of the waypoint on the system's x axis. This is not an absolute position in the universe.
     pub x: i64,

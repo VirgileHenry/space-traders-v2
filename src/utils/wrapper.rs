@@ -20,6 +20,20 @@ impl<T: Debug + Clone> DataWrapper<T> {
     }
 }
 
+/// Wrapper arround the data scheme: { "type": {...} }
+#[derive(Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct TypeWrapper<T: Debug + Clone> {
+    #[serde(rename = "type")]
+    _type: T,
+}
+
+impl<T: Debug + Clone> TypeWrapper<T> {
+    pub fn inner(self) -> T {
+        self._type
+    }
+}
+
 /// Wrapper arround the data array scheme: { "data": [...] }
 #[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]

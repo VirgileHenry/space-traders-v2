@@ -131,19 +131,3 @@ impl crate::client::SpaceTradersClient<Anonymous> {
         }
     }
 }
-
-#[cfg(test)]
-mod test {
-    use crate::client::TEST_AGENT_TOKEN;
-
-    #[tokio::test]
-    async fn test_agent() {
-        let auth_client = crate::client::SpaceTradersClient::new_with_auth(TEST_AGENT_TOKEN);
-        let anon_client = crate::client::SpaceTradersClient::new_anonymous();
-
-        let server_status = auth_client.get_server_status().await;
-        println!("{:?}", server_status);
-        let server_status = anon_client.get_server_status().await;
-        println!("{:?}", server_status);
-    }
-}

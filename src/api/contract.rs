@@ -162,17 +162,3 @@ impl SpaceTradersClient<Authenticated> {
     }
 }
 
-
-#[cfg(test)]
-mod test {
-    use crate::client::TEST_AGENT_TOKEN;
-
-    #[tokio::test]
-    async fn test_agent() {
-        let client = crate::client::SpaceTradersClient::new_with_auth(TEST_AGENT_TOKEN);
-        let contracts = client.list_contracts(None, None).await;
-        println!("{contracts:?}");
-        let contract = client.get_contract("cloyrd0gs1edps60cl4z96536").await;
-        println!("{contract:?}")
-    }
-}

@@ -5,11 +5,6 @@
 // #[cfg(all(not(test), not(debug_assertions)))]
 const SPACE_TRADERS_API: &'static str  = "https://api.spacetraders.io/v2";
 
-/// If you are using this API, this read a agent token from a file that is ignored by git.
-/// You can change the file with a valid token so you can test the api. 
-#[cfg(test)]
-pub(crate) const TEST_AGENT_TOKEN: &'static str = include_str!("../agent_secret/secret.txt");
-
 pub trait AuthState {}
 
 pub struct Authenticated(String);
@@ -76,6 +71,13 @@ impl SpaceTradersClient<Authenticated> {
 
     pub(crate) fn post(&self, path: &str) -> reqwest::RequestBuilder {
         self.http_client.post(format!("{}/{}", SPACE_TRADERS_API, path))
+            .header("Accept", "application/json")
+            .header("Content-Type", "application/json")
+            .header("Authorization", format!("Bearer {}", &self.auth_token.0))
+    }
+
+    pub(crate) fn patch(&self, path: &str) -> reqwest::RequestBuilder {
+        self.http_client.patch(format!("{}/{}", SPACE_TRADERS_API, path))
             .header("Accept", "application/json")
             .header("Content-Type", "application/json")
             .header("Authorization", format!("Bearer {}", &self.auth_token.0))

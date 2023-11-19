@@ -66,13 +66,3 @@ impl crate::client::SpaceTradersClient<Anonymous> {
         }
     }
 }
-
-#[cfg(test)]
-mod test {
-    #[tokio::test]
-    async fn test_agent() {
-        let client = crate::client::SpaceTradersClient::new_anonymous();
-        let agent = client.create_agent("virgile.henry@aalti.fi", "COSMIC", "BLUE").await;
-        println!("{:?}", agent);
-    }
-}

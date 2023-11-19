@@ -20,6 +20,19 @@ impl<T: Debug + Clone> DataWrapper<T> {
     }
 }
 
+/// Wrapper arround the data array scheme: { "data": [...] }
+#[derive(Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct ArrayWrapper<T: Debug + Clone> {
+    data: Vec<T>,
+}
+
+impl<T: Debug + Clone> ArrayWrapper<T> {
+    pub fn inner(self) -> Vec<T> {
+        self.data
+    }
+}
+
 /// Wrapper arround the data scheme: { "data": [...], "meta": {...} }
 #[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]

@@ -26,11 +26,11 @@ impl crate::client::SpaceTradersClient<Authenticated> {
     /// 
     /// A ship must have the Surveyor mount installed in order to use this function.
     pub async fn create_survey(&self, ship_symbol: &str) -> Result<CooldownAndSurveys, crate::error::Error> {
-        let response = self.post(&format!("my/ships/{ship_symbol}/srvey"))
+        let response = self.post(&format!("my/ships/{ship_symbol}/survey"))
             .send()
             .await?;
         match response.status().as_u16() {
-            200 => {
+            201 => {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;

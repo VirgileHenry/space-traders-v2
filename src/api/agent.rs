@@ -127,19 +127,3 @@ impl crate::client::SpaceTradersClient<Anonymous> {
         }
     }
 }
-
-#[cfg(test)]
-mod test {
-    use crate::client::TEST_AGENT_TOKEN;
-
-    #[tokio::test]
-    async fn test_agent() {
-        let client = crate::client::SpaceTradersClient::new_with_auth(TEST_AGENT_TOKEN);
-        let agent = client.get_agent().await;
-        println!("{agent:?}");
-        let agents = client.list_agents(None, None).await;
-        println!("{agents:?}");
-        let luciole = client.get_public_agent("LUCIOLE").await;
-        println!("{luciole:?}");
-    }
-}

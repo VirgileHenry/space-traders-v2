@@ -3,6 +3,10 @@ use self::server_error::ServerError;
 pub mod server_error;
 pub mod code;
 
+// todo : better error
+// I think error for this api should be Result<Result<T, GameError>, ActuallyBadError> ?
+// feels weird that error "json parsing error" and "not enough fuel in ship" are at the same level.
+
 #[derive(Debug)]
 pub enum Error {
     ServerErrorResponse {

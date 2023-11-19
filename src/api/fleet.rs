@@ -1,37 +1,25 @@
+pub mod cargo;
 pub mod chart;
 pub mod cooldown;
+pub mod mounts;
+pub mod nav;
+pub mod purchase;
 pub mod refining;
+pub mod refuel;
+pub mod resources;
 pub mod survey;
+pub mod scan;
 
 use serde::Deserialize;
-
 use crate::{
     client::{Authenticated, SpaceTradersClient},
     utils::{
         pagination::page_limit_and_index,
-        wrapper::{
-            PaginationWrapper,
-            DataWrapper
-        }
+        wrapper::{PaginationWrapper, DataWrapper}
     },
     error::server_error::ServerError,
-    schemas::{
-        agent::Agent,
-        ship::{Ship, ship_type::ShipType, ship_cargo::ShipCargo, ship_nav::ShipNav},
-        market::market_transaction::MarketTransaction,
-        meta::Meta,
-    }
+    schemas::{ship::Ship, meta::Meta, contract::Contract}
 };
-
-/// Result struct when purchasing a ship.
-/// Contains the agent, ship and transaction.
-#[derive(Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct ShipPurchaseResult {
-    pub agent: Agent,
-    pub ship: Ship,
-    pub transaction: MarketTransaction,
-}
 
 impl SpaceTradersClient<Authenticated> {
     /// Return a paginated list of all of ships under your agent's ownership.
@@ -47,35 +35,6 @@ impl SpaceTradersClient<Authenticated> {
                     .json::<serde_json::Value>()
                     .await?;
                 Ok(<PaginationWrapper::<Ship>>::deserialize(json)?.inner())
-            }
-            status => {
-                let json = response
-                    .json::<serde_json::Value>()
-                    .await?;
-                let server_error = <ServerError>::deserialize(json)?; 
-                Err(crate::error::Error::from((status, server_error)))
-            }
-        }
-    }
-
-    ///Purchase a ship from a Shipyard. In order to use this function, a ship under your agent's ownership must be in a waypoint that has the Shipyard trait, and the Shipyard must sell the type of the desired ship.
-    ///
-    /// Shipyards typically offer ship types, which are predefined templates of ships that have dedicated roles. A template comes with a preset of an engine, a reactor, and a frame. It may also include a few modules and mounts.
-    pub async fn purchase_ship(&self, ship_prefab: ShipType, at_waypoint: &str) -> Result<ShipPurchaseResult, crate::error::Error> {
-        let body = serde_json::json!({
-            "shipType": ship_prefab,
-            "waypointSymbol": at_waypoint,
-        });
-        let response = self.post("my/ships")
-            .json(&body) 
-            .send()
-            .await?;
-        match response.status().as_u16() {
-            201 => {
-                let json = response
-                    .json::<serde_json::Value>()
-                    .await?;
-                Ok(<DataWrapper::<ShipPurchaseResult>>::deserialize(json)?.inner())
             }
             status => {
                 let json = response
@@ -109,43 +68,23 @@ impl SpaceTradersClient<Authenticated> {
         }
     }
 
-    /// Retrieve the cargo of a ship under your agent's ownership.
-    pub async fn get_ship_cargo(&self, ship_symbol: &str) -> Result<ShipCargo, crate::error::Error> {
-        let response = self.get(&format!("my/ships/{ship_symbol}/cargo"))
-            .send()
-            .await?;
-        match response.status().as_u16() {
-            200 => {
-                let json = response
-                    .json::<serde_json::Value>()
-                    .await?;
-                Ok(<DataWrapper::<ShipCargo>>::deserialize(json)?.inner())
-            }
-            status => {
-                let json = response
-                    .json::<serde_json::Value>()
-                    .await?;
-                let server_error = <ServerError>::deserialize(json)?; 
-                Err(crate::error::Error::from((status, server_error)))
-            }
-        }
-    }
-
-    /// Attempt to move your ship into orbit at its current location. The request will only succeed if your ship is capable of moving into orbit at the time of the request.
+    /// Negotiate a new contract with the HQ.
     /// 
-    /// Orbiting ships are able to do actions that require the ship to be above surface such as navigating or extracting, but cannot access elements in their current waypoint, such as the market or a shipyard.
+    /// In order to negotiate a new contract, an agent must not have ongoing or offered contracts over the allowed maximum amount. Currently the maximum contracts an agent can have at a time is 1.
     /// 
-    /// The endpoint is idempotent - successive calls will succeed even if the ship is already in orbit.
-    pub async fn orbit_ship(&self, ship_symbol: &str) -> Result<ShipNav, crate::error::Error> {
-        let response = self.post(&format!("my/ships/{ship_symbol}/orbit"))
+    /// Once a contract is negotiated, it is added to the list of contracts offered to the agent, which the agent can then accept.
+    /// 
+    /// The ship must be present at any waypoint with a faction present to negotiate a contract with that faction.
+    pub async fn negotiate_contract(&self, ship_symbol: &str) -> Result<Contract, crate::error::Error> {
+        let response = self.get(&format!("my/ships/{ship_symbol}/negotiate/contract"))
             .send()
             .await?;
         match response.status().as_u16() {
-            200 => {
+            201 => {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                Ok(<DataWrapper::<ShipNav>>::deserialize(json)?.inner())
+                Ok(<DataWrapper::<Contract>>::deserialize(json)?.inner())
             }
             status => {
                 let json = response
@@ -156,34 +95,5 @@ impl SpaceTradersClient<Authenticated> {
             }
         }
     }
-
-    /// Attempt to dock your ship at its current location. Docking will only succeed if your ship is capable of docking at the time of the request.
-    ///
-    /// Docked ships can access elements in their current location, such as the market or a shipyard, but cannot do actions that require the ship to be above surface such as navigating or extracting.
-    ///
-    /// The endpoint is idempotent - successive calls will succeed even if the ship is already docked.
-    pub async fn dock_ship(&self, ship_symbol: &str) -> Result<ShipNav, crate::error::Error> {
-        let response = self.post(&format!("my/ships/{ship_symbol}/dock"))
-            .send()
-            .await?;
-        match response.status().as_u16() {
-            200 => {
-                let json = response
-                    .json::<serde_json::Value>()
-                    .await?;
-                Ok(<DataWrapper::<ShipNav>>::deserialize(json)?.inner())
-            }
-            status => {
-                let json = response
-                    .json::<serde_json::Value>()
-                    .await?;
-                let server_error = <ServerError>::deserialize(json)?; 
-                Err(crate::error::Error::from((status, server_error)))
-            }
-        }
-    }
-
-    
-
 
 }

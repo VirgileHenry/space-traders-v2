@@ -5,12 +5,12 @@ use super::code::ErrorCode;
 
 
 #[derive(Deserialize, Debug, Clone)]
-pub struct ServerError {
+pub struct SpaceTraderError {
     message: String,
     code: ErrorCode,
 }
 
-impl Display for ServerError {
+impl Display for SpaceTraderError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "SpaceTraders Error:\n")?;
         write!(f, "\tMessage: {}\n", self.message)?;

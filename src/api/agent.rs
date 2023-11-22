@@ -5,7 +5,7 @@ use crate::{
         pagination::page_limit_and_index
     },
     client::{Authenticated, Anonymous},
-    error::server_error::ServerError,
+    error::server_error::SpaceTraderError,
     schemas::{agent::Agent,meta::Meta},
 };
 
@@ -27,7 +27,7 @@ impl crate::client::SpaceTradersClient<Authenticated> {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                let server_error = <ServerError>::deserialize(json)?; 
+                let server_error = <SpaceTraderError>::deserialize(json)?; 
                 Err(crate::error::Error::from((status, server_error)))
             }
         }
@@ -51,7 +51,7 @@ impl crate::client::SpaceTradersClient<Authenticated> {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                let server_error = <ServerError>::deserialize(json)?; 
+                let server_error = <SpaceTraderError>::deserialize(json)?; 
                 Err(crate::error::Error::from((status, server_error)))
             }
         }
@@ -73,7 +73,7 @@ impl crate::client::SpaceTradersClient<Authenticated> {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                let server_error = <ServerError>::deserialize(json)?; 
+                let server_error = <SpaceTraderError>::deserialize(json)?; 
                 Err(crate::error::Error::from((status, server_error)))
             }
         }
@@ -99,7 +99,7 @@ impl crate::client::SpaceTradersClient<Anonymous> {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                let server_error = <ServerError>::deserialize(json)?; 
+                let server_error = <SpaceTraderError>::deserialize(json)?; 
                 Err(crate::error::Error::from((status, server_error)))
             }
         }
@@ -121,7 +121,7 @@ impl crate::client::SpaceTradersClient<Anonymous> {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                let server_error = <ServerError>::deserialize(json)?; 
+                let server_error = <SpaceTraderError>::deserialize(json)?; 
                 Err(crate::error::Error::from((status, server_error)))
             }
         }

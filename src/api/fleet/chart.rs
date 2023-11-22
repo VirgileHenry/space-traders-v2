@@ -9,7 +9,7 @@ use crate::{
         Authenticated
     },
     utils::wrapper::DataWrapper,
-    error::server_error::ServerError
+    error::server_error::SpaceTraderError
 };
 
 /// Wrapper around a chart and a waypoint.
@@ -42,7 +42,7 @@ impl SpaceTradersClient<Authenticated> {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                let server_error = <ServerError>::deserialize(json)?; 
+                let server_error = <SpaceTraderError>::deserialize(json)?; 
                 Err(crate::error::Error::from((status, server_error)))
             }
         }

@@ -1,4 +1,4 @@
-use self::server_error::ServerError;
+use self::server_error::SpaceTraderError;
 
 pub mod server_error;
 pub mod code;
@@ -11,7 +11,7 @@ pub mod code;
 pub enum Error {
     ServerErrorResponse {
         status: u16,
-        error: ServerError
+        error: SpaceTraderError
     },
     ErrorSendingRequest(reqwest::Error),
     JsonParsingError(serde_json::Error),
@@ -23,8 +23,8 @@ impl From<reqwest::Error> for Error {
     }
 }
 
-impl From<(u16, ServerError)> for Error {
-    fn from((status, error): (u16, ServerError)) -> Self {
+impl From<(u16, SpaceTraderError)> for Error {
+    fn from((status, error): (u16, SpaceTraderError)) -> Self {
         Error::ServerErrorResponse {
             status,
             error,

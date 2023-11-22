@@ -10,7 +10,7 @@ use crate::{
         wrapper::{PaginationWrapper, DataWrapper},
         pagination::page_limit_and_index
     },
-    error::server_error::ServerError,
+    error::server_error::SpaceTraderError,
     schemas::{faction::Faction, meta::Meta}
 };
 
@@ -34,7 +34,7 @@ impl SpaceTradersClient<Authenticated> {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                let server_error = <ServerError>::deserialize(json)?; 
+                let server_error = <SpaceTraderError>::deserialize(json)?; 
                 Err(crate::error::Error::from((status, server_error)))
             }
         }
@@ -56,7 +56,7 @@ impl SpaceTradersClient<Authenticated> {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                let server_error = <ServerError>::deserialize(json)?; 
+                let server_error = <SpaceTraderError>::deserialize(json)?; 
                 Err(crate::error::Error::from((status, server_error)))
             }
         }
@@ -82,7 +82,7 @@ impl SpaceTradersClient<Anonymous> {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                let server_error = <ServerError>::deserialize(json)?; 
+                let server_error = <SpaceTraderError>::deserialize(json)?; 
                 Err(crate::error::Error::from((status, server_error)))
             }
         }
@@ -104,7 +104,7 @@ impl SpaceTradersClient<Anonymous> {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                let server_error = <ServerError>::deserialize(json)?; 
+                let server_error = <SpaceTraderError>::deserialize(json)?; 
                 Err(crate::error::Error::from((status, server_error)))
             }
         }

@@ -2,7 +2,7 @@ use serde::{Serialize, Deserialize};
 use crate::{
     client::Authenticated,
     utils::wrapper::DataWrapper,
-    error::server_error::ServerError,
+    error::server_error::SpaceTraderError,
     schemas::{
         ship::ship_cargo::ShipCargo,
         cooldown::Cooldown,
@@ -96,7 +96,7 @@ impl crate::client::SpaceTradersClient<Authenticated> {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                let server_error = <ServerError>::deserialize(json)?; 
+                let server_error = <SpaceTraderError>::deserialize(json)?; 
                 Err(crate::error::Error::from((status, server_error)))
             }
         }

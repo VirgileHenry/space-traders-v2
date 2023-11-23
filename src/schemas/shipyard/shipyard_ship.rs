@@ -1,5 +1,6 @@
-use serde::Deserialize;
+mod shipyard_ship_crew;
 
+use serde::Deserialize;
 use crate::schemas::{
     ship::{
         ship_type::ShipType,
@@ -8,11 +9,12 @@ use crate::schemas::{
         ship_engine::ShipEngine,
         ship_module::ShipModule,
         ship_mount::ShipMount,
-        ship_crew::ShipCrew
     },
     market::market_trade_good::MarketTradeGoodActivity,
     supply_level::SupplyLevel,
 };
+
+use self::shipyard_ship_crew::ShipyardShipCrew;
 
 #[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -27,7 +29,7 @@ pub struct ShipyardShip {
     /// The supply level of a trade good.
     pub supply: SupplyLevel,
     /// The activity level of a trade good. If the good is an import, this represents how strong consumption is for the good. If the good is an export, this represents how strong the production is for the good.
-    pub activity: MarketTradeGoodActivity,
+    pub activity: Option<MarketTradeGoodActivity>,
     /// 
     pub purchase_price: i64,
     /// The frame of the ship. The frame determines the number of modules and mounting points of the ship, as well as base fuel capacity. As the condition of the frame takes more wear, the ship will become more sluggish and less maneuverable.
@@ -41,5 +43,5 @@ pub struct ShipyardShip {
     /// A mount is installed on the exterier of a ship.
     pub mounts: Vec<ShipMount>,
     /// 
-    pub crew: ShipCrew,
+    pub crew: ShipyardShipCrew,
 }

@@ -8,7 +8,7 @@ use super::ship_requirements::ShipRequirements;
 pub enum ShipEngineType {
     EngineImpulseDriveI,
     EngineIonDriveI,
-    EngineIonDriveII,
+    EngineIonDriveIi,
     EngineHyperDriveI,
 }
 

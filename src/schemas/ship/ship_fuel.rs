@@ -1,5 +1,5 @@
 use serde::Deserialize;
-use crate::utils::date_time_string::DateTimeString;
+
 
 /// Details of the ship's fuel tanks including how much fuel was consumed during the last transit or action.
 #[derive(Deserialize, Debug, Clone)]
@@ -20,5 +20,5 @@ pub struct ShipConsumedFuel {
     /// The amount of fuel consumed by the most recent transit or action.
     pub amount: u64,
     /// The time at which the fuel was consumed.
-    pub timestamp: DateTimeString,
+    pub timestamp: chrono::DateTime<chrono::Utc>,
 }

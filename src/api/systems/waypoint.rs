@@ -7,7 +7,7 @@ use crate::{
     },
     schemas::{
         meta::Meta,
-        waypoint::Waypoint,
+        waypoint::{Waypoint, waypoint_trait::WaypointTraitType, waypoint_type::WaypointType},
         market::Market,
         shipyard::Shipyard,
         jump_gate::JumpGate,
@@ -15,7 +15,7 @@ use crate::{
         trade_symbol::TradeSymbol,
         ship::ship_cargo::ShipCargo
     },
-    utils::wrapper::{PaginationWrapper, DataWrapper},
+    utils::{wrapper::{PaginationWrapper, DataWrapper, ErrorWrapper}, pagination::page_limit_and_index},
     error::server_error::SpaceTraderError
 };
 
@@ -23,8 +23,21 @@ impl SpaceTradersClient<Anonymous> {
     /// Return a paginated list of all of the waypoints for a given system.
     /// 
     /// If a waypoint is uncharted, it will return the Uncharted trait instead of its actual traits.
-    pub async fn list_waypoints_in_system(&self, system_symbol: &str) -> Result<(Vec<Waypoint>, Meta), crate::error::Error> {
-        let response = self.get(&format!("systems/{system_symbol}/waypoints")).send().await?;
+    pub async fn list_waypoints_in_system(&self, system_symbol: &str, page_limit: Option<u64>, page_index: Option<u64>, traits: Option<&[WaypointTraitType]>, waypoint_type: Option<WaypointType>) -> Result<(Vec<Waypoint>, Meta), crate::error::Error> {
+        let (limit, page) = page_limit_and_index(page_limit, page_index);
+        let traits_query: Vec<(&str, WaypointTraitType)> = match traits {
+            Some(traits) => traits.iter().map(|t| ("traits", *t)).collect::<Vec<_>>(),
+            None => Vec::with_capacity(0),
+        };
+        let type_query = match waypoint_type {
+            Some(waypoint_type) => vec![("type", waypoint_type)],
+            None => Vec::with_capacity(0),
+        };
+        let response = self.get(&format!("systems/{system_symbol}/waypoints"))
+            .query(&[("limit", limit), ("page", page)])
+            .query(&traits_query)
+            .query(&type_query)
+            .send().await?;
         match response.status().as_u16() {
             200 => {
                 let json = response.json::<serde_json::Value>().await?;
@@ -32,7 +45,7 @@ impl SpaceTradersClient<Anonymous> {
             },
             status => {
                 let json = response.json::<serde_json::Value>().await?;
-                let server_error = <SpaceTraderError>::deserialize(json)?;
+                let server_error = <ErrorWrapper<SpaceTraderError>>::deserialize(json)?.inner();
                 Err(crate::error::Error::from((status, server_error)))
             }
         }
@@ -48,7 +61,7 @@ impl SpaceTradersClient<Anonymous> {
             },
             status => {
                 let json = response.json::<serde_json::Value>().await?;
-                let server_error = <SpaceTraderError>::deserialize(json)?;
+                let server_error = <ErrorWrapper<SpaceTraderError>>::deserialize(json)?.inner();
                 Err(crate::error::Error::from((status, server_error)))
             }
         }
@@ -66,7 +79,7 @@ impl SpaceTradersClient<Anonymous> {
             },
             status => {
                 let json = response.json::<serde_json::Value>().await?;
-                let server_error = <SpaceTraderError>::deserialize(json)?;
+                let server_error = <ErrorWrapper<SpaceTraderError>>::deserialize(json)?.inner();
                 Err(crate::error::Error::from((status, server_error)))
             }
         }
@@ -82,7 +95,7 @@ impl SpaceTradersClient<Anonymous> {
             },
             status => {
                 let json = response.json::<serde_json::Value>().await?;
-                let server_error = <SpaceTraderError>::deserialize(json)?;
+                let server_error = <ErrorWrapper<SpaceTraderError>>::deserialize(json)?.inner();
                 Err(crate::error::Error::from((status, server_error)))
             }
         }
@@ -100,7 +113,7 @@ impl SpaceTradersClient<Anonymous> {
             },
             status => {
                 let json = response.json::<serde_json::Value>().await?;
-                let server_error = <SpaceTraderError>::deserialize(json)?;
+                let server_error = <ErrorWrapper<SpaceTraderError>>::deserialize(json)?.inner();
                 Err(crate::error::Error::from((status, server_error)))
             }
         }
@@ -116,7 +129,7 @@ impl SpaceTradersClient<Anonymous> {
             },
             status => {
                 let json = response.json::<serde_json::Value>().await?;
-                let server_error = <SpaceTraderError>::deserialize(json)?;
+                let server_error = <ErrorWrapper<SpaceTraderError>>::deserialize(json)?.inner();
                 Err(crate::error::Error::from((status, server_error)))
             }
         }
@@ -139,8 +152,21 @@ impl SpaceTradersClient<Authenticated> {
     /// Return a paginated list of all of the waypoints for a given system.
     /// 
     /// If a waypoint is uncharted, it will return the Uncharted trait instead of its actual traits.
-    pub async fn list_waypoints_in_system(&self, system_symbol: &str) -> Result<(Vec<Waypoint>, Meta), crate::error::Error> {
-        let response = self.get(&format!("systems/{system_symbol}/waypoints")).send().await?;
+    pub async fn list_waypoints_in_system(&self, system_symbol: &str, page_limit: Option<u64>, page_index: Option<u64>, traits: Option<&[WaypointTraitType]>, waypoint_type: Option<WaypointType>) -> Result<(Vec<Waypoint>, Meta), crate::error::Error> {
+        let (limit, page) = page_limit_and_index(page_limit, page_index);
+        let traits_query: Vec<(&str, WaypointTraitType)> = match traits {
+            Some(traits) => traits.iter().map(|t| ("traits", *t)).collect::<Vec<_>>(),
+            None => Vec::with_capacity(0),
+        };
+        let type_query = match waypoint_type {
+            Some(waypoint_type) => vec![("type", waypoint_type)],
+            None => Vec::with_capacity(0),
+        };
+        let response = self.get(&format!("systems/{system_symbol}/waypoints"))
+            .query(&[("limit", limit), ("page", page)])
+            .query(&traits_query)
+            .query(&type_query)
+            .send().await?;
         match response.status().as_u16() {
             200 => {
                 let json = response.json::<serde_json::Value>().await?;
@@ -148,7 +174,7 @@ impl SpaceTradersClient<Authenticated> {
             },
             status => {
                 let json = response.json::<serde_json::Value>().await?;
-                let server_error = <SpaceTraderError>::deserialize(json)?;
+                let server_error = <ErrorWrapper<SpaceTraderError>>::deserialize(json)?.inner();
                 Err(crate::error::Error::from((status, server_error)))
             }
         }
@@ -164,7 +190,7 @@ impl SpaceTradersClient<Authenticated> {
             },
             status => {
                 let json = response.json::<serde_json::Value>().await?;
-                let server_error = <SpaceTraderError>::deserialize(json)?;
+                let server_error = <ErrorWrapper<SpaceTraderError>>::deserialize(json)?.inner();
                 Err(crate::error::Error::from((status, server_error)))
             }
         }
@@ -182,7 +208,7 @@ impl SpaceTradersClient<Authenticated> {
             },
             status => {
                 let json = response.json::<serde_json::Value>().await?;
-                let server_error = <SpaceTraderError>::deserialize(json)?;
+                let server_error = <ErrorWrapper<SpaceTraderError>>::deserialize(json)?.inner();
                 Err(crate::error::Error::from((status, server_error)))
             }
         }
@@ -199,7 +225,7 @@ impl SpaceTradersClient<Authenticated> {
             },
             status => {
                 let json = response.json::<serde_json::Value>().await?;
-                let server_error = <SpaceTraderError>::deserialize(json)?;
+                let server_error = <ErrorWrapper<SpaceTraderError>>::deserialize(json)?.inner();
                 Err(crate::error::Error::from((status, server_error)))
             }
         }
@@ -217,7 +243,7 @@ impl SpaceTradersClient<Authenticated> {
             },
             status => {
                 let json = response.json::<serde_json::Value>().await?;
-                let server_error = <SpaceTraderError>::deserialize(json)?;
+                let server_error = <ErrorWrapper<SpaceTraderError>>::deserialize(json)?.inner();
                 Err(crate::error::Error::from((status, server_error)))
             }
         }
@@ -233,7 +259,7 @@ impl SpaceTradersClient<Authenticated> {
             },
             status => {
                 let json = response.json::<serde_json::Value>().await?;
-                let server_error = <SpaceTraderError>::deserialize(json)?;
+                let server_error = <ErrorWrapper<SpaceTraderError>>::deserialize(json)?.inner();
                 Err(crate::error::Error::from((status, server_error)))
             }
         }
@@ -256,7 +282,7 @@ impl SpaceTradersClient<Authenticated> {
             },
             status => {
                 let json = response.json::<serde_json::Value>().await?;
-                let server_error = <SpaceTraderError>::deserialize(json)?;
+                let server_error = <ErrorWrapper<SpaceTraderError>>::deserialize(json)?.inner();
                 Err(crate::error::Error::from((status, server_error)))
             }
         }

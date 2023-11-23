@@ -1,7 +1,7 @@
 pub mod contract_terms;
 
 use serde::Deserialize;
-use crate::utils::date_time_string::DateTimeString;
+
 use self::contract_terms::ContractTerms;
 
 /// Type of contract.
@@ -34,7 +34,7 @@ pub struct Contract {
     #[warn(deprecated)]
     pub expiration: String,
     /// The time at which the contract is no longer available to be accepted
-    pub deadline_to_accept: Option<DateTimeString>,
+    pub deadline_to_accept: Option<chrono::DateTime<chrono::Utc>>,
 }
 
 impl PartialEq for Contract {

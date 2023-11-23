@@ -4,7 +4,7 @@ use std::num::NonZeroU64;
 use serde::{Serialize, Deserialize};
 use crate::{
     client::{Authenticated, SpaceTradersClient},
-    utils::wrapper::DataWrapper,
+    utils::wrapper::{DataWrapper, ErrorWrapper},
     error::server_error::SpaceTraderError,
     schemas::{
         ship::ship_fuel::ShipFuel,
@@ -49,12 +49,11 @@ impl SpaceTradersClient<Authenticated> {
     /// Each fuel bought from the market replenishes 100 units in your ship's fuel.
     ///     
     /// Ships will always be refuel to their frame's maximum fuel capacity when using this action.
-    pub async fn refuel_ship(&self, ship_symbol: &str, refuel_info: &RefuelShipInfo) -> Result<RefuelShipResponse, crate::error::Error> {
-        let body = serde_json::to_value(refuel_info)?;
-        let response = self.post(&format!("my/ships/{ship_symbol}/refuel"))
-            .json(&body)
-            .send()
-            .await?;
+    pub async fn refuel_ship(&self, ship_symbol: &str, refuel_info: Option<&RefuelShipInfo>) -> Result<RefuelShipResponse, crate::error::Error> {
+        let response = match refuel_info {
+            Some(refuel_info) => self.post(&format!("my/ships/{ship_symbol}/refuel")).json(&serde_json::to_value(refuel_info)?).send().await?,
+            None => self.post(&format!("my/ships/{ship_symbol}/refuel")).header("content-length", 0).send().await?,
+        };
         match response.status().as_u16() {
             200 => {
                 let json = response
@@ -66,7 +65,7 @@ impl SpaceTradersClient<Authenticated> {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                let server_error = <SpaceTraderError>::deserialize(json)?; 
+                let server_error = <ErrorWrapper<SpaceTraderError>>::deserialize(json)?.inner(); 
                 Err(crate::error::Error::from((status, server_error)))
             }
         }

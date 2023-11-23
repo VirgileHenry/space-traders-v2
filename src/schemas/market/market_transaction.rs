@@ -1,5 +1,5 @@
 use serde::Deserialize;
-use crate::utils::date_time_string::DateTimeString;
+
 
 /// The activity level of a trade good. If the good is an import, this represents how strong consumption is for the good. If the good is an export, this represents how strong the production is for the good.
 #[derive(Deserialize, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -29,5 +29,5 @@ pub struct MarketTransaction {
     /// The total price of the transaction.
     pub total_price: u64,
     /// The timestamp of the transaction.
-    pub timestamp: DateTimeString,
+    pub timestamp: chrono::DateTime<chrono::Utc>,
 }

@@ -15,7 +15,7 @@ use crate::{
     client::{Authenticated, SpaceTradersClient},
     utils::{
         pagination::page_limit_and_index,
-        wrapper::{PaginationWrapper, DataWrapper}
+        wrapper::{PaginationWrapper, DataWrapper, ErrorWrapper}
     },
     error::server_error::SpaceTraderError,
     schemas::{ship::Ship, meta::Meta, contract::Contract}
@@ -23,7 +23,7 @@ use crate::{
 
 impl SpaceTradersClient<Authenticated> {
     /// Return a paginated list of all of ships under your agent's ownership.
-    pub async fn list_ships(&self, page_limit: Option<usize>, page_index: Option<usize>) -> Result<(Vec<Ship>, Meta), crate::error::Error> {
+    pub async fn list_ships(&self, page_limit: Option<u64>, page_index: Option<u64>) -> Result<(Vec<Ship>, Meta), crate::error::Error> {
         let (limit, page) = page_limit_and_index(page_limit, page_index);
         let response = self.get("my/ships")
             .query(&[("limit", limit), ("page", page)])
@@ -40,7 +40,7 @@ impl SpaceTradersClient<Authenticated> {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                let server_error = <SpaceTraderError>::deserialize(json)?; 
+                let server_error = <ErrorWrapper<SpaceTraderError>>::deserialize(json)?.inner(); 
                 Err(crate::error::Error::from((status, server_error)))
             }
         }
@@ -62,7 +62,7 @@ impl SpaceTradersClient<Authenticated> {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                let server_error = <SpaceTraderError>::deserialize(json)?; 
+                let server_error = <ErrorWrapper<SpaceTraderError>>::deserialize(json)?.inner(); 
                 Err(crate::error::Error::from((status, server_error)))
             }
         }
@@ -90,7 +90,7 @@ impl SpaceTradersClient<Authenticated> {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                let server_error = <SpaceTraderError>::deserialize(json)?; 
+                let server_error = <ErrorWrapper<SpaceTraderError>>::deserialize(json)?.inner(); 
                 Err(crate::error::Error::from((status, server_error)))
             }
         }

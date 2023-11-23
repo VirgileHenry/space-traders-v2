@@ -8,7 +8,7 @@ use crate::{
     utils::{
         wrapper::{
             PaginationWrapper,
-            DataWrapper
+            DataWrapper, ErrorWrapper
         },
         pagination::page_limit_and_index
     },
@@ -36,7 +36,7 @@ pub struct ContractAndCargo {
 
 impl SpaceTradersClient<Authenticated> {
     /// Return a paginated list of all your contracts.
-    pub async fn list_contracts(&self, page_limit: Option<usize>, page_index: Option<usize>) -> Result<(Vec<Contract>, Meta), crate::error::Error> {
+    pub async fn list_contracts(&self, page_limit: Option<u64>, page_index: Option<u64>) -> Result<(Vec<Contract>, Meta), crate::error::Error> {
         let (limit, page) = page_limit_and_index(page_limit, page_index);
         let response = self.get("my/contracts")
             .query(&[("limit", limit), ("page", page)])
@@ -53,7 +53,7 @@ impl SpaceTradersClient<Authenticated> {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                let server_error = <SpaceTraderError>::deserialize(json)?; 
+                let server_error = <ErrorWrapper<SpaceTraderError>>::deserialize(json)?.inner(); 
                 Err(crate::error::Error::from((status, server_error)))
             }
         }
@@ -75,7 +75,7 @@ impl SpaceTradersClient<Authenticated> {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                let server_error = <SpaceTraderError>::deserialize(json)?; 
+                let server_error = <ErrorWrapper<SpaceTraderError>>::deserialize(json)?.inner(); 
                 Err(crate::error::Error::from((status, server_error)))
             }
         }
@@ -87,6 +87,7 @@ impl SpaceTradersClient<Authenticated> {
     /// were not accepted yet, and whose deadlines has not passed yet.
     pub async fn accept_contract(&self, contract_id: &str) -> Result<AgentAndContract, crate::error::Error> {
         let response = self.post(&format!("my/contracts/{contract_id}/accept"))
+            .header("content-length", 0)
             .send()
             .await?;
         match response.status().as_u16() {
@@ -100,7 +101,7 @@ impl SpaceTradersClient<Authenticated> {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                let server_error = <SpaceTraderError>::deserialize(json)?; 
+                let server_error = <ErrorWrapper<SpaceTraderError>>::deserialize(json)?.inner(); 
                 Err(crate::error::Error::from((status, server_error)))
             }
         }
@@ -132,7 +133,7 @@ impl SpaceTradersClient<Authenticated> {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                let server_error = <SpaceTraderError>::deserialize(json)?; 
+                let server_error = <ErrorWrapper<SpaceTraderError>>::deserialize(json)?.inner(); 
                 Err(crate::error::Error::from((status, server_error)))
             }
         }
@@ -155,7 +156,7 @@ impl SpaceTradersClient<Authenticated> {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                let server_error = <SpaceTraderError>::deserialize(json)?; 
+                let server_error = <ErrorWrapper<SpaceTraderError>>::deserialize(json)?.inner(); 
                 Err(crate::error::Error::from((status, server_error)))
             }
         }

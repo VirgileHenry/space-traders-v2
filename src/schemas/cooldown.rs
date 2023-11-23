@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-use crate::utils::date_time_string::DateTimeString;
+
 
 /// A cooldown is a period of time in which a ship cannot perform certain actions.
 #[derive(Deserialize, Debug, Clone)]
@@ -13,7 +13,7 @@ pub struct Cooldown {
     /// The remaining duration of the cooldown in seconds
     pub remaining_seconds: u64,
     /// The date and time when the cooldown expires in ISO 8601 format
-    pub expiration: Option<DateTimeString>,
+    pub expiration: Option<chrono::DateTime<chrono::Utc>>,
 }
 
 

@@ -1,5 +1,5 @@
 use serde::Deserialize;
-use crate::utils::date_time_string::DateTimeString;
+
 
 /// Results of a transaction with a shipyard.
 #[derive(Deserialize, Debug, Clone)]
@@ -14,5 +14,5 @@ pub struct ShipyardTransaction {
     /// The symbol of the agent that made the transaction.
     pub agent_symbol: String,
     /// The timestamp of the transaction.
-    pub timestamp: DateTimeString,
+    pub timestamp: chrono::DateTime<chrono::Utc>,
 }

@@ -1,7 +1,7 @@
 use serde::Deserialize;
 use crate::{
     client::{Authenticated, SpaceTradersClient},
-    utils::wrapper::DataWrapper,
+    utils::wrapper::{DataWrapper, ErrorWrapper},
     error::server_error::SpaceTraderError,
     schemas::{
         ship::{ship_nav::{ShipNav, ship_nav_flight_mode::ShipNavFlightMode}, ship_fuel::ShipFuel},
@@ -33,6 +33,13 @@ pub struct NavResult {
     pub nav: ShipNav,
 }
 
+/// Wrapper arround the nav scheme: { "nav": {...} }
+#[derive(Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct NavWrapper {
+    pub nav: ShipNav,
+}
+
 impl SpaceTradersClient<Authenticated> {
     /// Attempt to move your ship into orbit at its current location. The request will only succeed if your ship is capable of moving into orbit at the time of the request.
     /// 
@@ -41,20 +48,19 @@ impl SpaceTradersClient<Authenticated> {
     /// The endpoint is idempotent - successive calls will succeed even if the ship is already in orbit.
     pub async fn orbit_ship(&self, ship_symbol: &str) -> Result<ShipNav, crate::error::Error> {
         let response = self.post(&format!("my/ships/{ship_symbol}/orbit"))
+            .header("content-length", 0)
             .send()
             .await?;
         match response.status().as_u16() {
             200 => {
-                let json = response
-                    .json::<serde_json::Value>()
-                    .await?;
-                Ok(<DataWrapper::<ShipNav>>::deserialize(json)?.inner())
+                let json = response.json::<serde_json::Value>().await?;
+                Ok(<DataWrapper::<NavWrapper>>::deserialize(json)?.inner().nav)
             }
             status => {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                let server_error = <SpaceTraderError>::deserialize(json)?; 
+                let server_error = <ErrorWrapper<SpaceTraderError>>::deserialize(json)?.inner(); 
                 Err(crate::error::Error::from((status, server_error)))
             }
         }
@@ -74,13 +80,13 @@ impl SpaceTradersClient<Authenticated> {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                Ok(<DataWrapper::<ShipNav>>::deserialize(json)?.inner())
+                Ok(<DataWrapper::<NavWrapper>>::deserialize(json)?.inner().nav)
             }
             status => {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                let server_error = <SpaceTraderError>::deserialize(json)?; 
+                let server_error = <ErrorWrapper<SpaceTraderError>>::deserialize(json)?.inner(); 
                 Err(crate::error::Error::from((status, server_error)))
             }
         }
@@ -108,7 +114,7 @@ impl SpaceTradersClient<Authenticated> {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                let server_error = <SpaceTraderError>::deserialize(json)?; 
+                let server_error = <ErrorWrapper<SpaceTraderError>>::deserialize(json)?.inner(); 
                 Err(crate::error::Error::from((status, server_error)))
             }
         }
@@ -138,7 +144,7 @@ impl SpaceTradersClient<Authenticated> {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                let server_error = <SpaceTraderError>::deserialize(json)?; 
+                let server_error = <ErrorWrapper<SpaceTraderError>>::deserialize(json)?.inner(); 
                 Err(crate::error::Error::from((status, server_error)))
             }
         }
@@ -166,7 +172,7 @@ impl SpaceTradersClient<Authenticated> {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                let server_error = <SpaceTraderError>::deserialize(json)?; 
+                let server_error = <ErrorWrapper<SpaceTraderError>>::deserialize(json)?.inner(); 
                 Err(crate::error::Error::from((status, server_error)))
             }
         }
@@ -188,7 +194,7 @@ impl SpaceTradersClient<Authenticated> {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                let server_error = <SpaceTraderError>::deserialize(json)?; 
+                let server_error = <ErrorWrapper<SpaceTraderError>>::deserialize(json)?.inner(); 
                 Err(crate::error::Error::from((status, server_error)))
             }
         }
@@ -216,7 +222,7 @@ impl SpaceTradersClient<Authenticated> {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                let server_error = <SpaceTraderError>::deserialize(json)?; 
+                let server_error = <ErrorWrapper<SpaceTraderError>>::deserialize(json)?.inner(); 
                 Err(crate::error::Error::from((status, server_error)))
             }
         }

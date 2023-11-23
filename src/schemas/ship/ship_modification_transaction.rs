@@ -1,5 +1,5 @@
 use serde::Deserialize;
-use crate::utils::date_time_string::DateTimeString;
+
 
 /// Result of a transaction for a ship modification, such as installing a mount or a module.
 #[derive(Deserialize, Debug, Clone)]
@@ -14,5 +14,5 @@ pub struct ShipModificationTransaction {
     /// The total price of the transaction.
     pub total_price: u64,
     /// The timestamp of the transaction.
-    pub timestamp: DateTimeString,
+    pub timestamp: chrono::DateTime<chrono::Utc>,
 }

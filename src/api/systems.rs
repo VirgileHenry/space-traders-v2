@@ -8,14 +8,17 @@ use crate::{
         Authenticated
     },
     schemas::{system::System, meta::Meta},
-    utils::wrapper::{PaginationWrapper, DataWrapper},
+    utils::{wrapper::{PaginationWrapper, DataWrapper, ErrorWrapper}, pagination::page_limit_and_index},
     error::server_error::SpaceTraderError
 };
 
 impl SpaceTradersClient<Anonymous> {
     /// Return a paginated list of all systems.
-    pub async fn list_systems(&self) -> Result<(Vec<System>, Meta), crate::error::Error> {
-        let response = self.get("systems").send().await?;
+    pub async fn list_systems(&self, page_limit: Option<u64>, page_index: Option<u64>) -> Result<(Vec<System>, Meta), crate::error::Error> {
+        let (limit, page) = page_limit_and_index(page_limit, page_index);
+        let response = self.get("systems")
+            .query(&[("limit", limit), ("page", page)])
+            .send().await?;
         match response.status().as_u16() {
             200 => {
                 let json = response.json::<serde_json::Value>().await?;
@@ -23,7 +26,7 @@ impl SpaceTradersClient<Anonymous> {
             },
             status => {
                 let json = response.json::<serde_json::Value>().await?;
-                let server_error = <SpaceTraderError>::deserialize(json)?;
+                let server_error = <ErrorWrapper<SpaceTraderError>>::deserialize(json)?.inner();
                 Err(crate::error::Error::from((status, server_error)))
             }
         }
@@ -39,7 +42,7 @@ impl SpaceTradersClient<Anonymous> {
             },
             status => {
                 let json = response.json::<serde_json::Value>().await?;
-                let server_error = <SpaceTraderError>::deserialize(json)?;
+                let server_error = <ErrorWrapper<SpaceTraderError>>::deserialize(json)?.inner();
                 Err(crate::error::Error::from((status, server_error)))
             }
         }
@@ -49,8 +52,11 @@ impl SpaceTradersClient<Anonymous> {
 
 impl SpaceTradersClient<Authenticated> {
     /// Return a paginated list of all systems.
-    pub async fn list_systems(&self) -> Result<(Vec<System>, Meta), crate::error::Error> {
-        let response = self.get("systems").send().await?;
+    pub async fn list_systems(&self, page_limit: Option<u64>, page_index: Option<u64>) -> Result<(Vec<System>, Meta), crate::error::Error> {
+        let (limit, page) = page_limit_and_index(page_limit, page_index);
+        let response = self.get("systems")
+            .query(&[("limit", limit), ("page", page)])
+            .send().await?;
         match response.status().as_u16() {
             200 => {
                 let json = response.json::<serde_json::Value>().await?;
@@ -58,7 +64,7 @@ impl SpaceTradersClient<Authenticated> {
             },
             status => {
                 let json = response.json::<serde_json::Value>().await?;
-                let server_error = <SpaceTraderError>::deserialize(json)?;
+                let server_error = <ErrorWrapper<SpaceTraderError>>::deserialize(json)?.inner();
                 Err(crate::error::Error::from((status, server_error)))
             }
         }
@@ -74,7 +80,7 @@ impl SpaceTradersClient<Authenticated> {
             },
             status => {
                 let json = response.json::<serde_json::Value>().await?;
-                let server_error = <SpaceTraderError>::deserialize(json)?;
+                let server_error = <ErrorWrapper<SpaceTraderError>>::deserialize(json)?.inner();
                 Err(crate::error::Error::from((status, server_error)))
             }
         }

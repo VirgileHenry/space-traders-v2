@@ -9,12 +9,9 @@ use self::{
     waypoint_type::WaypointType,
     waypoint_orbital::WaypointOrbital,
     waypoint_trait::WaypointTrait,
-    waypoint_modifier::WaypointModifier
+    waypoint_modifier::WaypointModifier, waypoint_faction::WaypointFaction
 };
-use super::{
-    faction::faction_symbol::FactionSymbol,
-    chart::Chart
-};
+use super::chart::Chart;
 
 /// A waypoint is a location that ships can travel to such as a Planet, Moon or Space Station.
 #[derive(Deserialize, Debug, Clone)]
@@ -36,7 +33,7 @@ pub struct Waypoint {
     /// The symbol of the parent waypoint, if this waypoint is in orbit around another waypoint. Otherwise this value is undefined.
     pub orbits: Option<String>,
     /// The faction that controls the waypoint.
-    pub faction: FactionSymbol,
+    pub faction: WaypointFaction,
     /// The traits of the waypoint.
     pub traits: Vec<WaypointTrait>,
     /// The modifiers of the waypoint.

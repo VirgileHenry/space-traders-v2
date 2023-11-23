@@ -6,6 +6,7 @@ use serde_repr::Deserialize_repr;
 #[derive(Deserialize_repr, Debug, Clone, Copy)]
 #[repr(u16)]
 pub enum ErrorCode {
+    ResourceDoesNotExist = 404,
     CooldownConflictError = 4000,
     TokenEmptyError = 4100,
     TokenMissingSubjectError = 4101,
@@ -16,7 +17,7 @@ pub enum ErrorCode {
     AccountNotExistsError = 4106,
     AgentNotExistsError = 4107,
     AccountHasNoAgentError = 4108,
-    RegisterAgentExistsError = 4109,
+    RegisterAgentExistsError = 4111,
     NavigateInTransitError = 4200,
     NavigateInvalidDestinationError = 4201,
     NavigateOutsideSystemError = 4202,
@@ -55,6 +56,7 @@ pub enum ErrorCode {
     ShipInvalidRefineryGoodError = 4237,
     ShipInvalidRefineryTypeError = 4238,
     ShipMissingRefineryError = 4239,
+    ShipNotInShipyardForTransaction = 4245,
     ShipMissingSurveyorError = 4240,
     AcceptContractNotAuthorizedError = 4500,
     AcceptContractConflictError = 4501,

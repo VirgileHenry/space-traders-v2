@@ -34,6 +34,20 @@ impl<T: Debug + Clone> TypeWrapper<T> {
     }
 }
 
+/// Wrapper arround the error scheme: { "error": {...} }
+#[derive(Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct ErrorWrapper<T: Debug + Clone> {
+    error: T,
+}
+
+impl<T: Debug + Clone> ErrorWrapper<T> {
+    pub fn inner(self) -> T {
+        self.error
+    }
+}
+
+
 /// Wrapper arround the data array scheme: { "data": [...] }
 #[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]

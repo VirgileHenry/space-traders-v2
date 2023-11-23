@@ -37,7 +37,7 @@ pub struct ShipFrame {
     /// The amount of slots that can be dedicated to modules installed in the ship. Each installed module take up a number of slots, and once there are no more slots, no new modules can be installed.
     pub module_slots: u64,
     /// The amount of slots that can be dedicated to mounts installed in the ship. Each installed mount takes up a number of points, and once there are no more points remaining, no new mounts can be installed.
-    pub mouting_points: u64,
+    pub mounting_points: u64,
     /// The maximum amount of fuel that can be stored in this ship. When refueling, the ship will be refueled to this amount.
     pub fuel_capacity: u64,
     /// The requirements for installation on a ship

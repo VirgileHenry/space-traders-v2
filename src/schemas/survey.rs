@@ -1,7 +1,7 @@
 pub mod survey_deposit;
 
 use serde::{Serialize, Deserialize};
-use crate::utils::date_time_string::DateTimeString;
+
 use self::survey_deposit::SurveyDeposit;
 
 /// The size of the deposit. This value indicates how much can be extracted from the survey before it is exhausted.
@@ -24,7 +24,7 @@ pub struct Survey {
     /// A list of deposits that can be found at this location. A ship will extract one of these deposits when using this survey in an extraction request. If multiple deposits of the same type are present, the chance of extracting that deposit is increased.
     pub deposits: Vec<SurveyDeposit>,
     /// The date and time when the survey expires. After this date and time, the survey will no longer be available for extraction.
-    pub expiration: DateTimeString,
+    pub expiration: chrono::DateTime<chrono::Utc>,
     /// The size of the deposit. This value indicates how much can be extracted from the survey before it is exhausted.
     pub size: SurveySize,
 }

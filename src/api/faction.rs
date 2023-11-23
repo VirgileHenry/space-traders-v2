@@ -7,7 +7,7 @@ use crate::{
         SpaceTradersClient
     },
     utils::{
-        wrapper::{PaginationWrapper, DataWrapper},
+        wrapper::{PaginationWrapper, DataWrapper, ErrorWrapper},
         pagination::page_limit_and_index
     },
     error::server_error::SpaceTraderError,
@@ -17,7 +17,7 @@ use crate::{
 
 impl SpaceTradersClient<Authenticated> {
     /// Return a paginated list of all the factions in the game.
-    pub async fn list_factions(&self, page_limit: Option<usize>, page_index: Option<usize>) -> Result<(Vec<Faction>, Meta), crate::error::Error> {
+    pub async fn list_factions(&self, page_limit: Option<u64>, page_index: Option<u64>) -> Result<(Vec<Faction>, Meta), crate::error::Error> {
         let (limit, page) = page_limit_and_index(page_limit, page_index);
         let response = self.get("factions")
             .query(&[("limit", limit), ("page", page)])
@@ -34,7 +34,7 @@ impl SpaceTradersClient<Authenticated> {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                let server_error = <SpaceTraderError>::deserialize(json)?; 
+                let server_error = <ErrorWrapper<SpaceTraderError>>::deserialize(json)?.inner(); 
                 Err(crate::error::Error::from((status, server_error)))
             }
         }
@@ -56,7 +56,7 @@ impl SpaceTradersClient<Authenticated> {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                let server_error = <SpaceTraderError>::deserialize(json)?; 
+                let server_error = <ErrorWrapper<SpaceTraderError>>::deserialize(json)?.inner(); 
                 Err(crate::error::Error::from((status, server_error)))
             }
         }
@@ -65,7 +65,7 @@ impl SpaceTradersClient<Authenticated> {
 
 impl SpaceTradersClient<Anonymous> {
     /// Return a paginated list of all the factions in the game.
-    pub async fn list_factions(&self, page_limit: Option<usize>, page_index: Option<usize>) -> Result<(Vec<Faction>, Meta), crate::error::Error> {
+    pub async fn list_factions(&self, page_limit: Option<u64>, page_index: Option<u64>) -> Result<(Vec<Faction>, Meta), crate::error::Error> {
         let (limit, page) = page_limit_and_index(page_limit, page_index);
         let response = self.get("factions")
             .query(&[("limit", limit), ("page", page)])
@@ -82,7 +82,7 @@ impl SpaceTradersClient<Anonymous> {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                let server_error = <SpaceTraderError>::deserialize(json)?; 
+                let server_error = <ErrorWrapper<SpaceTraderError>>::deserialize(json)?.inner(); 
                 Err(crate::error::Error::from((status, server_error)))
             }
         }
@@ -104,7 +104,7 @@ impl SpaceTradersClient<Anonymous> {
                 let json = response
                     .json::<serde_json::Value>()
                     .await?;
-                let server_error = <SpaceTraderError>::deserialize(json)?; 
+                let server_error = <ErrorWrapper<SpaceTraderError>>::deserialize(json)?.inner(); 
                 Err(crate::error::Error::from((status, server_error)))
             }
         }
